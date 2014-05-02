@@ -26,7 +26,7 @@
 
   <groupId>net.ju-n.compile-command-annotations</groupId>
   <artifactId>compile-command-annotations</artifactId>
-  <version>1.0.1</version>
+  <version>1.0.2-SNAPSHOT</version>
 
   <name>compile-command-annotations</name>
   <inceptionYear>2014</inceptionYear>
@@ -44,7 +44,7 @@
     <url>http://github.com/nicoulaj/compile-command-annotations</url>
     <connection>scm:git:git@github.com:nicoulaj/compile-command-annotations.git</connection>
     <developerConnection>scm:git:git@github.com:nicoulaj/compile-command-annotations.git</developerConnection>
-    <tag>1.0.1</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <issueManagement>
