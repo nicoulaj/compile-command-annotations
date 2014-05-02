@@ -24,7 +24,6 @@ import java.util.Map;
 
 /**
  * Utility for integration test asserts..
- * <p/>
  * <p>See {@code src/main/it/projects/.../postbuild.groovy} scripts.</p>
  *
  * @author <a href="http://github.com/nicoulaj">Julien Nicoulaud</a>
