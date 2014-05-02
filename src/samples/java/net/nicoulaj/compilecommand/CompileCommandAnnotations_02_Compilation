@@ -1,0 +1,2 @@
+compileonly net.nicoulaj.compilecommand.CompileCommandAnnotations_02_Compilation::method02 ()V
+exclude net.nicoulaj.compilecommand.CompileCommandAnnotations_02_Compilation::method01 ()V

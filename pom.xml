@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2014 Julien Nicoulaud <julien.nicoulaud@gmail.com>
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>net.ju-n</groupId>
+    <artifactId>net-ju-n-parent</artifactId>
+    <version>28</version>
+  </parent>
+
+  <groupId>net.ju-n.compile-command-annotations</groupId>
+  <artifactId>compile-command-annotations</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+
+  <name>compile-command-annotations</name>
+  <inceptionYear>2014</inceptionYear>
+  <description>Annotation based configuration file generator for the Hotspot JVM JIT compiler.</description>
+  <url>http://nicoulaj.github.com/compile-command-annotations</url>
+
+  <licenses>
+    <license>
+      <name>LGPL 3.0</name>
+      <url>https://www.gnu.org/licenses/lgpl.html</url>
+    </license>
+  </licenses>
+
+  <scm>
+    <url>http://github.com/nicoulaj/compile-command-annotations</url>
+    <connection>scm:git:git@github.com:nicoulaj/compile-command-annotations.git</connection>
+    <developerConnection>scm:git:git@github.com:nicoulaj/compile-command-annotations.git</developerConnection>
+    <tag>HEAD</tag>
+  </scm>
+
+  <issueManagement>
+    <system>Github</system>
+    <url>http://github.com/nicoulaj/compile-command-annotations/issues</url>
+  </issueManagement>
+
+  <ciManagement>
+    <system>Cloudbees BuildHive</system>
+    <url>http://travis-ci.org/nicoulaj/compile-command-annotations</url>
+  </ciManagement>
+
+  <distributionManagement>
+    <site>
+      <id>github</id>
+      <url>gitsite:git@github.com/nicoulaj/compile-command-annotations.git</url>
+    </site>
+  </distributionManagement>
+
+  <properties>
+    <java.level>1.8</java.level>
+    <metainf-services.version>1.5</metainf-services.version>
+    <guava.version>17.0</guava.version>
+    <fest-assert.version>2.0M10</fest-assert.version>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.kohsuke.metainf-services</groupId>
+      <artifactId>metainf-services</artifactId>
+      <version>${metainf-services.version}</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.testng</groupId>
+      <artifactId>testng</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>${guava.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.easytesting</groupId>
+      <artifactId>fest-assert-core</artifactId>
+      <version>${fest-assert.version}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>${java.level}</source>
+          <target>${java.level}</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>add-additional-test-source-roots</id>
+            <phase>generate-test-sources</phase>
+            <goals>
+              <goal>add-test-source</goal>
+            </goals>
+            <configuration>
+              <sources>
+                <source>${project.basedir}/src/samples/java</source>
+              </sources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-invoker-plugin</artifactId>
+        <configuration>
+          <localRepositoryPath>${project.build.directory}/it/local-repository</localRepositoryPath>
+          <showErrors>true</showErrors>
+          <settingsFile>src/it/settings.xml</settingsFile>
+          <projectsDirectory>src/it/tests</projectsDirectory>
+          <pomIncludes>
+            <pomInclude>*/pom.xml</pomInclude>
+          </pomIncludes>
+          <cloneProjectsTo>${project.build.directory}/it/tests</cloneProjectsTo>
+          <reportsDirectory>${project.build.directory}/it/reports</reportsDirectory>
+          <addTestClassPath>true</addTestClassPath>
+          <selectorScript>selector.bsh</selectorScript>
+          <goals>
+            <goal>clean</goal>
+            <goal>install</goal>
+          </goals>
+        </configuration>
+        <executions>
+          <execution>
+            <id>run-integration-tests</id>
+            <goals>
+              <goal>install</goal>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-site-plugin</artifactId>
+        <dependencies>
+          <dependency>
+            <groupId>org.apache.maven.doxia</groupId>
+            <artifactId>doxia-module-markdown</artifactId>
+            <version>${doxia-module-markdown.version}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.kohsuke</groupId>
+            <artifactId>wagon-gitsite</artifactId>
+            <version>${wagon-gitsite.version}</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+    </plugins>
+  </build>
+
+  <reporting>
+    <plugins>
+      <plugin>
+        <artifactId>maven-site-plugin</artifactId>
+        <version>${maven-site-plugin.version}</version>
+      </plugin>
+      <plugin>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <version>${maven-project-info-reports-plugin.version}</version>
+      </plugin>
+      <plugin>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>${maven-javadoc-plugin.version}</version>
+      </plugin>
+      <plugin>
+        <artifactId>maven-jxr-plugin</artifactId>
+        <version>${maven-jxr-plugin.version}</version>
+      </plugin>
+      <plugin>
+        <artifactId>maven-surefire-report-plugin</artifactId>
+        <version>${maven-surefire-report-plugin.version}</version>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>taglist-maven-plugin</artifactId>
+        <version>${taglist-maven-plugin.version}</version>
+        <configuration>
+          <tagListOptions>
+            <tagClasses>
+              <tagClass>
+                <displayName>TODO tags</displayName>
+                <tags>
+                  <tag>
+                    <matchString>todo</matchString>
+                    <matchType>ignoreCase</matchType>
+                  </tag>
+                </tags>
+              </tagClass>
+              <tagClass>
+                <displayName>FIXME tags</displayName>
+                <tags>
+                  <tag>
+                    <matchString>fixme</matchString>
+                    <matchType>ignoreCase</matchType>
+                  </tag>
+                </tags>
+              </tagClass>
+            </tagClasses>
+          </tagListOptions>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-changelog-plugin</artifactId>
+        <version>${maven-changelog-plugin.version}</version>
+        <configuration>
+          <displayChangeSetDetailUrl>${project.scm.url}/commit/%REV%</displayChangeSetDetailUrl>
+          <displayFileDetailUrl>${project.scm.url}/tree/master/%FILE%</displayFileDetailUrl>
+          <displayFileRevDetailUrl>${project.scm.url}/blob/%REV%/%FILE%</displayFileRevDetailUrl>
+        </configuration>
+      </plugin>
+    </plugins>
+  </reporting>
+
+</project>

@@ -1,0 +1,3 @@
+option net.nicoulaj.compilecommand.CompileCommandAnnotations_04_Options::method01 ()V EliminateAutoBox=true
+option net.nicoulaj.compilecommand.CompileCommandAnnotations_04_Options::method01 ()V PrintIntrinsics=true
+option net.nicoulaj.compilecommand.CompileCommandAnnotations_04_Options::method01 ()V UseSuperWord=true
