@@ -17,20 +17,20 @@
 
 package net.nicoulaj.compilecommand;
 
-import net.nicoulaj.compilecommand.annotations.DontInline;
-import net.nicoulaj.compilecommand.annotations.Inline;
+import net.nicoulaj.compilecommand.annotations.CompileOnly;
+import net.nicoulaj.compilecommand.annotations.Exclude;
 
-public class CompileCommandAnnotations_01_Inlining {
+public class Sample_02_Compilation {
 
-    // This sample demonstrates how to force or prevent JIT from inlining a method.
+    // This sample demonstrates how to force or prevent JIT from compiling a method.
     //
     // To run:
     //   $ mvn clean test
     //   $ java -cp target/test-classes \
     //          -XX:+UnlockDiagnosticVMOptions \
-    //          -XX:+PrintInlining \
-    //          -XX:CompileCommandFile=src/samples/java/net/nicoulaj/compilecommand/CompileCommandAnnotations_01_Inlining \
-    //          net.nicoulaj.compilecommand.CompileCommandAnnotations_01_Inlining
+    //          -XX:+PrintCompilation \
+    //          -XX:CompileCommandFile=src/samples/java/net/nicoulaj/compilecommand/Sample_02_Compilation \
+    //          net.nicoulaj.compilecommand.Sample_02_Compilation
 
     public static void main(String... args) {
         for (int i = 0; i < 100_000; i++) {
@@ -39,11 +39,11 @@ public class CompileCommandAnnotations_01_Inlining {
         }
     }
 
-    @Inline // Force the just in time compiler to attempt inlining the specified method.
+    @Exclude // Exclude the specified method from just in time compilation.
     private static void method01() {
     }
 
-    @DontInline // Prevent the just in time compiler from inlining the specified method.
+    @CompileOnly // Exclude all methods from just in time compilation except for the specified method.
     private static void method02() {
     }
 }

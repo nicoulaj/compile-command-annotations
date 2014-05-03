@@ -1,10 +1,19 @@
-Hotspot compile command annotations
-===================================
-
 Introduction
 ------------
+
 The [Hotspot JVM](http://www.oracle.com/technetwork/java/javase/tech/index-jsp-136373.html) allows to provide a command file for the JIT compiler (see [-XX:CompileCommandFile](http://docs.oracle.com/javase/8/docs/technotes/tools/unix/java.html)).
+
 Using this project, you can generate this file automatically from annotations in the source code.
+
+
+Disclaimer
+----------
+
+The Hotspot JIT does a tremendous work optimizing your code, don't see this as "@Inline for the masses" : this is not a cheap way to make your code faster.
+
+Also, this is not portable and uses an internal feature of the Hotspot JVM.
+
+Only use this if you know what you are doing and have a good reason to.
 
 
 Usage
@@ -21,10 +30,16 @@ Usage
           </dependency>
         </dependencies>
 
- * Add annotations in your source code (see [samples](${project.scm.url}/tree/master/src/samples/java/net/nicoulaj/compilecommand))
+ * Add annotations in your source code :
 
- * When your program is compiled, the compile command file is generated in `target/classes/META-INF/hotspot_compiler`
+        @Inline
+        public void method01() {
+        }
 
- * Run your program using the compile command file:
+       See [samples](${project.scm.url}/tree/master/src/samples/java/net/nicoulaj/compilecommand) and [integration tests](${project.scm.url}/tree/master/src/it/tests).
+
+ * When your program is compiled, the file is generated at `META-INF/hotspot_compiler`
+
+ * You can then run your program using the compile command file:
 
         java -XX:CompileCommandFile:target/classes/META-INF/hotspot_compiler ...

@@ -1,0 +1,2 @@
+dontinline net.nicoulaj.compilecommand.Sample_01_Inlining::method02 ()V
+inline net.nicoulaj.compilecommand.Sample_01_Inlining::method01 ()V

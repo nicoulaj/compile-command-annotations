@@ -1,0 +1,3 @@
+quiet
+log net.nicoulaj.compilecommand.Sample_03_Logging::method02 ()V
+print net.nicoulaj.compilecommand.Sample_03_Logging::method01 ()V

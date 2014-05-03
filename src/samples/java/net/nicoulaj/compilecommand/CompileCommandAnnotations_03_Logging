@@ -1,3 +1,0 @@
-quiet
-log net.nicoulaj.compilecommand.CompileCommandAnnotations_03_Logging::method02 ()V
-print net.nicoulaj.compilecommand.CompileCommandAnnotations_03_Logging::method01 ()V

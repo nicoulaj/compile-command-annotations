@@ -17,12 +17,14 @@
 
 package net.nicoulaj.compilecommand;
 
-import net.nicoulaj.compilecommand.annotations.*;
+import net.nicoulaj.compilecommand.annotations.Option;
 
-@Quiet // Do not print the compile commands on application startup.
-public class CompileCommandAnnotations_03_Logging {
+public class Sample_04_Options {
 
-    // This sample demonstrates the different logging options.
+    // This sample demonstrates how to use compiler options.
+    //
+    // To list available options:
+    //   $ java -XX:+UnlockDiagnosticVMOptions -XX:+PrintFlagsFinal -version | grep C2
     //
     // To run:
     //   $ mvn clean test
@@ -31,21 +33,15 @@ public class CompileCommandAnnotations_03_Logging {
     //          -XX:+PrintCompilation \
     //          -XX:+LogCompilation \
     //          -XX:+PrintInlining \
-    //          -XX:CompileCommandFile=src/samples/java/net/nicoulaj/compilecommand/CompileCommandAnnotations_03_Logging \
-    //          net.nicoulaj.compilecommand.CompileCommandAnnotations_03_Logging
+    //          -XX:CompileCommandFile=src/samples/java/net/nicoulaj/compilecommand/Sample_04_Options \
+    //          net.nicoulaj.compilecommand.Sample_04_Options
 
     public static void main(String... args) {
-        for (int i = 0; i < 100_000; i++) {
-            method01();
-            method02();
-        }
     }
 
-    @Print // Print generated assembler code after compilation of the specified method.
+    @Option("UseSuperWord=true")
+    @Option("PrintIntrinsics=true")
+    @Option("EliminateAutoBox=true")
     private static void method01() {
-    }
-
-    @Log // Exclude compilation logging for all methods except for the specified method.
-    private static void method02() {
     }
 }

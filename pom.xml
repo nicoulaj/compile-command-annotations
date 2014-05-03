@@ -28,7 +28,7 @@
   <artifactId>compile-command-annotations</artifactId>
   <version>1.0.3-SNAPSHOT</version>
 
-  <name>compile-command-annotations</name>
+  <name>Hotspot compile command annotations</name>
   <inceptionYear>2014</inceptionYear>
   <description>Annotation based configuration file generator for the Hotspot JVM JIT compiler.</description>
   <url>http://nicoulaj.github.com/compile-command-annotations</url>

@@ -44,6 +44,8 @@
   <body>
     <menu name="Overview">
       <item name="Introduction" href="index.html"/>
+      <item name="Samples" href="http://github.com/nicoulaj/compile-command-annotations/tree/master/src/samples/java/net/nicoulaj/compilecommand"/>
+      <item name="Download" href="http://search.maven.org/#search%7Cga%7C1%7Ca%3A%22compile-command-annotations%22"/>
     </menu>
     <menu ref="reports"/>
   </body>

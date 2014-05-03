@@ -24,9 +24,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import static com.google.common.collect.ObjectArrays.concat;
 import static java.nio.file.Paths.get;
-import static net.nicoulaj.compilecommand.JavaCompilationTester.Report;
 import static net.nicoulaj.compilecommand.CompileCommandProcessor.COMPILE_COMMAND_FILE_PATH_DEFAULT;
+import static net.nicoulaj.compilecommand.JavaCompilationTester.Report;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -42,7 +43,7 @@ public final class CompileCommandProcessorTest {
 
     private static final Path SAMPLES_SOURCES = get("src/samples/java/net/nicoulaj/compilecommand");
 
-    private static final Path SAMPLES_RESOURCES = get("src/samples/java/net/nicoulaj/compilecommand");
+    private static final Path SAMPLES_RESOURCES = get("src/samples/resources/net/nicoulaj/compilecommand");
 
     private static final Path TEST_CASES_SOURCES = get("src/test/java/net/nicoulaj/compilecommand/testcases");
 
@@ -50,30 +51,9 @@ public final class CompileCommandProcessorTest {
 
     @DataProvider
     public Object[][] testcases() throws IOException {
-        return getDataProvider(TEST_CASES_SOURCES, TEST_CASES_RESOURCES);
-    }
-
-    @DataProvider
-    public Object[][] samples() throws IOException {
-        return getDataProvider(SAMPLES_SOURCES, SAMPLES_RESOURCES);
-    }
-
-    @Test(dataProvider = "testcases")
-    public void testCase(Path source, Path expected) {
-        test(source, expected);
-    }
-
-    @Test(dataProvider = "samples")
-    public void testSample(Path source, Path expected) {
-        test(source, expected);
-    }
-
-    private void test(Path source, Path expected) {
-        final Report compilation = JAVAC.compile(source);
-        assertTrue(compilation.isSuccessful(), "compilation failed");
-        assertFalse(compilation.hasErrors(), "compilation has errors");
-        assertFalse(compilation.hasWarnings(), "compilation has warnings");
-        assertThat(compilation.getClassesDirectory().resolve(COMPILE_COMMAND_FILE_PATH_DEFAULT).toFile()).hasContentEqualTo(expected.toFile());
+        return concat(getDataProvider(TEST_CASES_SOURCES, TEST_CASES_RESOURCES),
+                      getDataProvider(SAMPLES_SOURCES, SAMPLES_RESOURCES),
+                      Object[].class);
     }
 
     private Object[][] getDataProvider(Path sourceDir, Path resourceDir) throws IOException {
@@ -83,5 +63,14 @@ public final class CompileCommandProcessorTest {
                     .sorted()
                     .map(path -> new Object[]{path, resourceDir.resolve(path.getFileName().toString().replace(".java", ""))})
                     .toArray(Object[][]::new);
+    }
+
+    @Test(dataProvider = "testcases")
+    public void test(Path source, Path expected) {
+        final Report compilation = JAVAC.compile(source);
+        assertTrue(compilation.isSuccessful(), "compilation failed");
+        assertFalse(compilation.hasErrors(), "compilation has errors");
+        assertFalse(compilation.hasWarnings(), "compilation has warnings");
+        assertThat(compilation.getClassesDirectory().resolve(COMPILE_COMMAND_FILE_PATH_DEFAULT).toFile()).hasContentEqualTo(expected.toFile());
     }
 }

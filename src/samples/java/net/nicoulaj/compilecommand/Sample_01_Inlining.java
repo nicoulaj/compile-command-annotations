@@ -17,31 +17,33 @@
 
 package net.nicoulaj.compilecommand;
 
-import net.nicoulaj.compilecommand.annotations.Option;
+import net.nicoulaj.compilecommand.annotations.DontInline;
+import net.nicoulaj.compilecommand.annotations.Inline;
 
-public class CompileCommandAnnotations_04_Options {
+public class Sample_01_Inlining {
 
-    // This sample demonstrates how to use compiler options.
-    //
-    // To list available options:
-    //   $ java -XX:+UnlockDiagnosticVMOptions -XX:+PrintFlagsFinal -version | grep C2
+    // This sample demonstrates how to force or prevent JIT from inlining a method.
     //
     // To run:
     //   $ mvn clean test
     //   $ java -cp target/test-classes \
     //          -XX:+UnlockDiagnosticVMOptions \
-    //          -XX:+PrintCompilation \
-    //          -XX:+LogCompilation \
     //          -XX:+PrintInlining \
-    //          -XX:CompileCommandFile=src/samples/java/net/nicoulaj/compilecommand/CompileCommandAnnotations_04_Options \
-    //          net.nicoulaj.compilecommand.CompileCommandAnnotations_04_Options
+    //          -XX:CompileCommandFile=src/samples/java/net/nicoulaj/compilecommand/Sample_01_Inlining \
+    //          net.nicoulaj.compilecommand.Sample_01_Inlining
 
     public static void main(String... args) {
+        for (int i = 0; i < 100_000; i++) {
+            method01();
+            method02();
+        }
     }
 
-    @Option("UseSuperWord=true")
-    @Option("PrintIntrinsics=true")
-    @Option("EliminateAutoBox=true")
+    @Inline // Force the just in time compiler to attempt inlining the specified method.
     private static void method01() {
+    }
+
+    @DontInline // Prevent the just in time compiler from inlining the specified method.
+    private static void method02() {
     }
 }

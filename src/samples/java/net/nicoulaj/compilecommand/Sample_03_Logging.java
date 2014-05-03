@@ -17,20 +17,22 @@
 
 package net.nicoulaj.compilecommand;
 
-import net.nicoulaj.compilecommand.annotations.CompileOnly;
-import net.nicoulaj.compilecommand.annotations.Exclude;
+import net.nicoulaj.compilecommand.annotations.*;
 
-public class CompileCommandAnnotations_02_Compilation {
+@Quiet // Do not print the compile commands on application startup.
+public class Sample_03_Logging {
 
-    // This sample demonstrates how to force or prevent JIT from compiling a method.
+    // This sample demonstrates the different logging options.
     //
     // To run:
     //   $ mvn clean test
     //   $ java -cp target/test-classes \
     //          -XX:+UnlockDiagnosticVMOptions \
     //          -XX:+PrintCompilation \
-    //          -XX:CompileCommandFile=src/samples/java/net/nicoulaj/compilecommand/CompileCommandAnnotations_02_Compilation \
-    //          net.nicoulaj.compilecommand.CompileCommandAnnotations_02_Compilation
+    //          -XX:+LogCompilation \
+    //          -XX:+PrintInlining \
+    //          -XX:CompileCommandFile=src/samples/java/net/nicoulaj/compilecommand/Sample_03_Logging \
+    //          net.nicoulaj.compilecommand.Sample_03_Logging
 
     public static void main(String... args) {
         for (int i = 0; i < 100_000; i++) {
@@ -39,11 +41,11 @@ public class CompileCommandAnnotations_02_Compilation {
         }
     }
 
-    @Exclude // Exclude the specified method from just in time compilation.
+    @Print // Print generated assembler code after compilation of the specified method.
     private static void method01() {
     }
 
-    @CompileOnly // Exclude all methods from just in time compilation except for the specified method.
+    @Log // Exclude compilation logging for all methods except for the specified method.
     private static void method02() {
     }
 }
