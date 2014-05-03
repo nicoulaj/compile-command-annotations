@@ -9,7 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="Date-Revision-yyyymmdd" content="20140503" />
     <meta http-equiv="Content-Language" content="en" />
-    <title>compile-command-annotations - Hotspot compile command annotations</title>
+    <title>Hotspot compile command annotations - Introduction</title>
     <link rel="stylesheet" href="./css/apache-maven-fluido-1.3.1.min.css" />
     <link rel="stylesheet" href="./css/site.css" />
     <link rel="stylesheet" href="./css/print.css" media="print" />
@@ -53,7 +53,7 @@
           <div id="banner">
         <div class="pull-left">
                                 <div id="bannerLeft">
-                <h2>compile-command-annotations</h2>
+                <h2>Hotspot compile command annotations</h2>
                 </div>
                       </div>
         <div class="pull-right">  </div>
@@ -67,7 +67,7 @@
                   <li id="publishDate">Last Published: 2014-05-03
                       <span class="divider">|</span>
                    </li>
-                  <li id="projectVersion">Version: 1.0.2
+                  <li id="projectVersion">Version: 1.0.3
                       </li>
                       
                 
@@ -89,6 +89,20 @@
   
             <a href="#"><i class="none"></i>Introduction</a>
           </li>
+                
+      <li>
+  
+                          <a href="http://github.com/nicoulaj/compile-command-annotations/tree/master/src/samples/java/net/nicoulaj/compilecommand" class="externalLink" title="Samples">
+          <i class="none"></i>
+        Samples</a>
+            </li>
+                
+      <li>
+  
+                          <a href="http://search.maven.org/#search%7Cga%7C1%7Ca%3A%22compile-command-annotations%22" class="externalLink" title="Download">
+          <i class="none"></i>
+        Download</a>
+            </li>
                               <li class="nav-header">Project Documentation</li>
                                                                                                                                                                                                                                                                                                                                     
       <li>
@@ -223,10 +237,15 @@
                 
         <div id="bodyColumn"  class="span9" >
                                   
-            <h1>Hotspot compile command annotations</h1>
-<div class="section">
+            <div class="section">
 <h2>Introduction<a name="Introduction"></a></h2>
-<p>The <a class="externalLink" href="http://www.oracle.com/technetwork/java/javase/tech/index-jsp-136373.html">Hotspot JVM</a> allows to provide a command file for the JIT compiler (see <a class="externalLink" href="http://docs.oracle.com/javase/8/docs/technotes/tools/unix/java.html">-XX:CompileCommandFile</a>). Using this project, you can generate this file automatically from annotations in the source code.</p></div>
+<p>The <a class="externalLink" href="http://www.oracle.com/technetwork/java/javase/tech/index-jsp-136373.html">Hotspot JVM</a> allows to provide a command file for the JIT compiler (see <a class="externalLink" href="http://docs.oracle.com/javase/8/docs/technotes/tools/unix/java.html">-XX:CompileCommandFile</a>).</p>
+<p>Using this project, you can generate this file automatically from annotations in the source code.</p></div>
+<div class="section">
+<h2>Disclaimer<a name="Disclaimer"></a></h2>
+<p>The Hotspot JIT does a tremendous work optimizing your code, don&#x2019;t see this as &#x201c;@Inline for the masses&#x201d; : this is not a cheap way to make your code faster.</p>
+<p>Also, this is not portable and uses an internal feature of the Hotspot JVM.</p>
+<p>Only use this if you know what you are doing and have a good reason to.</p></div>
 <div class="section">
 <h2>Usage<a name="Usage"></a></h2>
 
@@ -240,20 +259,27 @@
   &lt;dependency&gt;
     &lt;groupId&gt;net.ju-n.compile-command-annotations&lt;/groupId&gt;
     &lt;artifactId&gt;compile-command-annotations&lt;/artifactId&gt;
-    &lt;version&gt;1.0.2&lt;/version&gt;
+    &lt;version&gt;1.0.3&lt;/version&gt;
     &lt;optional&gt;true&lt;/optional&gt;
   &lt;/dependency&gt;
 &lt;/dependencies&gt;
 </pre></div></li>
   
 <li>
-<p>Add annotations in your source code (see <a class="externalLink" href="http://github.com/nicoulaj/compile-command-annotations/tree/master/src/samples/java/net/nicoulaj/compilecommand">samples</a>)</p></li>
+<p>Add annotations in your source code :</p>
+  
+<div class="source">
+<pre>@Inline
+public void method01() {
+}
+</pre></div>
+<p>See <a class="externalLink" href="http://github.com/nicoulaj/compile-command-annotations/tree/master/src/samples/java/net/nicoulaj/compilecommand">samples</a> and <a class="externalLink" href="http://github.com/nicoulaj/compile-command-annotations/tree/master/src/it/tests">integration tests</a>.</p></li>
   
 <li>
-<p>When your program is compiled, the compile command file is generated in <tt>target/classes/META-INF/hotspot_compiler</tt></p></li>
+<p>When your program is compiled, the file is generated at <tt>META-INF/hotspot_compiler</tt></p></li>
   
 <li>
-<p>Run your program using the compile command file:</p>
+<p>You can then run your program using the compile command file:</p>
   
 <div class="source">
 <pre>java -XX:CompileCommandFile:target/classes/META-INF/hotspot_compiler ...
