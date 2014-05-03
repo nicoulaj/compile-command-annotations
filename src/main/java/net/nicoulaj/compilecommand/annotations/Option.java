@@ -18,7 +18,6 @@
 package net.nicoulaj.compilecommand.annotations;
 
 import java.lang.annotation.Documented;
-import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
@@ -36,7 +35,6 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
 @Documented
 @Retention(SOURCE)
 @Target({CONSTRUCTOR, METHOD})
-@Repeatable(Options.class)
 public @interface Option {
 
     String value();

@@ -37,5 +37,5 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
 @Target({CONSTRUCTOR, METHOD})
 public @interface Options {
 
-    Option[] value();
+    String[] value();
 }

@@ -17,7 +17,7 @@
 
 package net.nicoulaj.compilecommand;
 
-import net.nicoulaj.compilecommand.annotations.Option;
+import net.nicoulaj.compilecommand.annotations.Options;
 
 public class Sample_04_Options {
 
@@ -33,15 +33,15 @@ public class Sample_04_Options {
     //          -XX:+PrintCompilation \
     //          -XX:+LogCompilation \
     //          -XX:+PrintInlining \
-    //          -XX:CompileCommandFile=src/samples/java/net/nicoulaj/compilecommand/Sample_04_Options \
+    //          -XX:CompileCommandFile=src/samples/resources/net/nicoulaj/compilecommand/Sample_04_Options \
     //          net.nicoulaj.compilecommand.Sample_04_Options
 
     public static void main(String... args) {
     }
 
-    @Option("UseSuperWord=true")
-    @Option("PrintIntrinsics=true")
-    @Option("EliminateAutoBox=true")
+    @Options({"UseSuperWord=true",
+              "PrintIntrinsics=true",
+              "EliminateAutoBox=true"})
     private static void method01() {
     }
 }

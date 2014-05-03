@@ -31,11 +31,11 @@ public class Sample_03_Logging {
     //          -XX:+PrintCompilation \
     //          -XX:+LogCompilation \
     //          -XX:+PrintInlining \
-    //          -XX:CompileCommandFile=src/samples/java/net/nicoulaj/compilecommand/Sample_03_Logging \
+    //          -XX:CompileCommandFile=src/samples/resources/net/nicoulaj/compilecommand/Sample_03_Logging \
     //          net.nicoulaj.compilecommand.Sample_03_Logging
 
     public static void main(String... args) {
-        for (int i = 0; i < 100_000; i++) {
+        for (int i = 0; i < 100000; i++) {
             method01();
             method02();
         }

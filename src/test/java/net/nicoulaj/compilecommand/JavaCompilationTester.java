@@ -19,22 +19,22 @@ package net.nicoulaj.compilecommand;
 
 import javax.tools.*;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
 
 import static com.google.common.collect.Iterables.toArray;
-import static java.nio.file.Files.*;
-import static java.nio.file.Paths.get;
+import static java.lang.System.nanoTime;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
 import static javax.tools.Diagnostic.Kind.MANDATORY_WARNING;
 import static javax.tools.Diagnostic.Kind.WARNING;
 import static javax.tools.JavaCompiler.CompilationTask;
-import static javax.tools.StandardLocation.*;
+import static javax.tools.StandardLocation.CLASS_OUTPUT;
+import static javax.tools.StandardLocation.SOURCE_OUTPUT;
 
 /**
  * Java compiler for testing.
@@ -45,9 +45,9 @@ public final class JavaCompilationTester {
 
     private static final JavaCompiler COMPILER = ToolProvider.getSystemJavaCompiler();
 
-    private static final Path COMPILATION_OUTPUT_BASE_DIRECTORY = get("target", "test-compilation");
+    private static final File COMPILATION_OUTPUT_BASE_DIRECTORY = new File("target", "test-compilation");
 
-    public Report compile(Path source, String... options) {
+    public Report compile(File source, String... options) {
         return compile(source.toString(), options);
     }
 
@@ -61,34 +61,30 @@ public final class JavaCompilationTester {
             if (COMPILER.isSupportedOption(option) < 0)
                 throw new IllegalArgumentException("Unsupported option \"" + option + "\"");
 
-        final DiagnosticCollector<JavaFileObject> collector = new DiagnosticCollector<>();
+        final DiagnosticCollector<JavaFileObject> collector = new DiagnosticCollector<JavaFileObject>();
         final StandardJavaFileManager fileManager = COMPILER.getStandardFileManager(collector, Locale.getDefault(), Charset.defaultCharset());
 
-        Path outputClasses;
-        Path outputSources;
-        Path outputNativeHeaders;
+        File outputClasses;
+        File outputSources;
         try {
-            createDirectories(COMPILATION_OUTPUT_BASE_DIRECTORY);
-            final Path output = createTempDirectory(COMPILATION_OUTPUT_BASE_DIRECTORY, "test-compilation-");
+            final File output = new File(COMPILATION_OUTPUT_BASE_DIRECTORY, String.valueOf(nanoTime()));
+            if (!output.mkdirs()) throw new RuntimeException("Failed creating compilation output directory");
 
-            outputClasses = output.resolve("classes");
-            createDirectory(outputClasses);
-            fileManager.setLocation(CLASS_OUTPUT, singleton(outputClasses.toFile()));
+            outputClasses = new File(output, "classes");
+            if (!outputClasses.mkdir()) throw new RuntimeException("Failed creating compilation output directory");
+            fileManager.setLocation(CLASS_OUTPUT, singleton(outputClasses));
 
-            outputSources = output.resolve("sources");
-            createDirectory(outputSources);
-            fileManager.setLocation(SOURCE_OUTPUT, singleton(outputClasses.toFile()));
-
-            outputNativeHeaders = output.resolve("native-headers");
-            createDirectory(outputNativeHeaders);
-            fileManager.setLocation(NATIVE_HEADER_OUTPUT, singleton(outputNativeHeaders.toFile()));
+            outputSources = new File(output, "sources");
+            if (!outputSources.mkdir()) throw new RuntimeException("Failed creating compilation output directory");
+            fileManager.setLocation(SOURCE_OUTPUT, singleton(outputClasses));
 
         } catch (IOException e) {
             throw new RuntimeException("Failed setting up compilation output directories", e);
         }
 
-        try (ByteArrayOutputStream stream = new ByteArrayOutputStream();
-             OutputStreamWriter out = new OutputStreamWriter(stream)) {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        OutputStreamWriter out = new OutputStreamWriter(stream);
+        try {
 
             final CompilationTask task = COMPILER.getTask(out,
                                                           fileManager,
@@ -101,20 +97,22 @@ public final class JavaCompilationTester {
 
             final String stdout = new String(stream.toByteArray());
 
-            return new Report(outputClasses, outputSources, outputNativeHeaders, successful, collector.getDiagnostics(), stdout);
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            return new Report(outputClasses, outputSources, successful, collector.getDiagnostics(), stdout);
+        } finally {
+            try {
+                stream.close();
+                out.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
     public static final class Report {
 
-        private final Path classesDirectory;
+        private final File classesDirectory;
 
-        private final Path sourcesDirectory;
-
-        private final Path nativeHeadersDirectory;
+        private final File sourcesDirectory;
 
         private final boolean successful;
 
@@ -122,30 +120,24 @@ public final class JavaCompilationTester {
 
         private final String stdout;
 
-        Report(final Path classesDirectory,
-               final Path sourcesDirectory,
-               final Path nativeHeadersDirectory,
+        Report(final File classesDirectory,
+               final File sourcesDirectory,
                final boolean successful,
                final List<Diagnostic<? extends JavaFileObject>> diagnostics,
                final String stdout) {
             this.classesDirectory = classesDirectory;
             this.sourcesDirectory = sourcesDirectory;
-            this.nativeHeadersDirectory = nativeHeadersDirectory;
             this.successful = successful;
             this.diagnostics = diagnostics;
             this.stdout = stdout;
         }
 
-        public Path getClassesDirectory() {
+        public File getClassesDirectory() {
             return classesDirectory;
         }
 
-        public Path getSourcesDirectory() {
+        public File getSourcesDirectory() {
             return sourcesDirectory;
-        }
-
-        public Path getNativeHeadersDirectory() {
-            return nativeHeadersDirectory;
         }
 
         public boolean isSuccessful() {

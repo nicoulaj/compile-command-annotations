@@ -65,19 +65,12 @@
   </distributionManagement>
 
   <properties>
-    <java.level>1.8</java.level>
-    <metainf-services.version>1.5</metainf-services.version>
+    <java.level>1.6</java.level>
     <guava.version>17.0</guava.version>
     <fest-assert.version>2.0M10</fest-assert.version>
   </properties>
 
   <dependencies>
-    <dependency>
-      <groupId>org.kohsuke.metainf-services</groupId>
-      <artifactId>metainf-services</artifactId>
-      <version>${metainf-services.version}</version>
-      <optional>true</optional>
-    </dependency>
     <dependency>
       <groupId>org.testng</groupId>
       <artifactId>testng</artifactId>
@@ -104,6 +97,7 @@
         <configuration>
           <source>${java.level}</source>
           <target>${java.level}</target>
+          <compilerArgument>-proc:none</compilerArgument>
         </configuration>
       </plugin>
       <plugin>

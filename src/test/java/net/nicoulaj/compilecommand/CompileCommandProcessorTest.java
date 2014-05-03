@@ -20,14 +20,17 @@ package net.nicoulaj.compilecommand;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.google.common.collect.ObjectArrays.concat;
-import static java.nio.file.Paths.get;
+import static java.util.Arrays.sort;
 import static net.nicoulaj.compilecommand.CompileCommandProcessor.COMPILE_COMMAND_FILE_PATH_DEFAULT;
 import static net.nicoulaj.compilecommand.JavaCompilationTester.Report;
+import static org.apache.commons.io.FilenameUtils.getBaseName;
+import static org.apache.commons.io.FilenameUtils.getExtension;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -41,13 +44,13 @@ public final class CompileCommandProcessorTest {
 
     private static final JavaCompilationTester JAVAC = new JavaCompilationTester();
 
-    private static final Path SAMPLES_SOURCES = get("src/samples/java/net/nicoulaj/compilecommand");
+    private static final File SAMPLES_SOURCES = new File("src/samples/java/net/nicoulaj/compilecommand");
 
-    private static final Path SAMPLES_RESOURCES = get("src/samples/resources/net/nicoulaj/compilecommand");
+    private static final File SAMPLES_RESOURCES = new File("src/samples/resources/net/nicoulaj/compilecommand");
 
-    private static final Path TEST_CASES_SOURCES = get("src/test/java/net/nicoulaj/compilecommand/testcases");
+    private static final File TEST_CASES_SOURCES = new File("src/test/java/net/nicoulaj/compilecommand/testcases");
 
-    private static final Path TEST_CASES_RESOURCES = get("src/test/resources/net/nicoulaj/compilecommand/testcases");
+    private static final File TEST_CASES_RESOURCES = new File("src/test/resources/net/nicoulaj/compilecommand/testcases");
 
     @DataProvider
     public Object[][] testcases() throws IOException {
@@ -56,21 +59,24 @@ public final class CompileCommandProcessorTest {
                       Object[].class);
     }
 
-    private Object[][] getDataProvider(Path sourceDir, Path resourceDir) throws IOException {
-        return Files.walk(sourceDir)
-                    .filter(path -> path.toString().endsWith(".java"))
-                    .filter(path -> !path.endsWith("package-info.java"))
-                    .sorted()
-                    .map(path -> new Object[]{path, resourceDir.resolve(path.getFileName().toString().replace(".java", ""))})
-                    .toArray(Object[][]::new);
+    private Object[][] getDataProvider(File sourceDir, File resourceDir) throws IOException {
+        final List<Object[]> data = new ArrayList<Object[]>();
+        final File[] sources = sourceDir.listFiles();
+        if (sources == null) throw new IllegalArgumentException("No source in " + sourceDir);
+        sort(sources);
+        for (File source : sources)
+            if ("java".equals(getExtension(source.toString())))
+                if (!"package-info".equals(getBaseName(source.toString())))
+                    data.add(new Object[]{source, new File(resourceDir, getBaseName(source.toString()))});
+        return data.toArray(new Object[data.size()][]);
     }
 
     @Test(dataProvider = "testcases")
-    public void test(Path source, Path expected) {
+    public void test(File source, File expected) {
         final Report compilation = JAVAC.compile(source);
         assertTrue(compilation.isSuccessful(), "compilation failed");
         assertFalse(compilation.hasErrors(), "compilation has errors");
         assertFalse(compilation.hasWarnings(), "compilation has warnings");
-        assertThat(compilation.getClassesDirectory().resolve(COMPILE_COMMAND_FILE_PATH_DEFAULT).toFile()).hasContentEqualTo(expected.toFile());
+        assertThat(new File(compilation.getClassesDirectory(), COMPILE_COMMAND_FILE_PATH_DEFAULT)).hasContentEqualTo(expected);
     }
 }

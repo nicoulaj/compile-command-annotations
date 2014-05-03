@@ -36,17 +36,19 @@ try {
     helper.assertBuildLogContains("CompilerOracle: inline net/nicoulaj/compilecommand/IT01.method10 (Ljava/lang/Boolean;Ljava/lang/Short;Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Float;Ljava/lang/Double;Ljava/lang/Character;Ljava/lang/Byte;)V")
 
     // Check PrintInlining traces
-    helper.assertBuildLogContains("net.nicoulaj.compilecommand.IT01::<init> (5 bytes)   force inline by CompileOracle")
-    helper.assertBuildLogContains("net.nicoulaj.compilecommand.IT01::method01 (1 bytes)   force inline by CompileOracle")
-    helper.assertBuildLogContains("net.nicoulaj.compilecommand.IT01::method02 (1 bytes)   force inline by CompileOracle")
-    helper.assertBuildLogContains("net.nicoulaj.compilecommand.IT01::method03 (1 bytes)   force inline by CompileOracle")
-    helper.assertBuildLogContains("net.nicoulaj.compilecommand.IT01::method04 (1 bytes)   force inline by CompileOracle")
-    helper.assertBuildLogContains("net.nicoulaj.compilecommand.IT01::method05 (2 bytes)   force inline by CompileOracle")
-    helper.assertBuildLogContains("net.nicoulaj.compilecommand.IT01::method06 (1 bytes)   force inline by CompileOracle")
-    helper.assertBuildLogContains("net.nicoulaj.compilecommand.IT01::method07 (1 bytes)   force inline by CompileOracle")
-    helper.assertBuildLogContains("net.nicoulaj.compilecommand.IT01::method08 (2 bytes)   force inline by CompileOracle")
-    helper.assertBuildLogContains("net.nicoulaj.compilecommand.IT01::method09 (1 bytes)   force inline by CompileOracle")
-    helper.assertBuildLogContains("net.nicoulaj.compilecommand.IT01::method10 (1 bytes)   force inline by CompileOracle")
+    if (!helper.isJava6()) { // PrintInlining does not seem to produce any output on Java 6 production VM
+        helper.assertBuildLogContains("net.nicoulaj.compilecommand.IT01::<init> (5 bytes)   force inline by Compile")
+        helper.assertBuildLogContains("net.nicoulaj.compilecommand.IT01::method01 (1 bytes)   force inline by Compile")
+        helper.assertBuildLogContains("net.nicoulaj.compilecommand.IT01::method02 (1 bytes)   force inline by Compile")
+        helper.assertBuildLogContains("net.nicoulaj.compilecommand.IT01::method03 (1 bytes)   force inline by Compile")
+        helper.assertBuildLogContains("net.nicoulaj.compilecommand.IT01::method04 (1 bytes)   force inline by Compile")
+        helper.assertBuildLogContains("net.nicoulaj.compilecommand.IT01::method05 (2 bytes)   force inline by Compile")
+        helper.assertBuildLogContains("net.nicoulaj.compilecommand.IT01::method06 (1 bytes)   force inline by Compile")
+        helper.assertBuildLogContains("net.nicoulaj.compilecommand.IT01::method07 (1 bytes)   force inline by Compile")
+        helper.assertBuildLogContains("net.nicoulaj.compilecommand.IT01::method08 (2 bytes)   force inline by Compile")
+        helper.assertBuildLogContains("net.nicoulaj.compilecommand.IT01::method09 (1 bytes)   force inline by Compile")
+        helper.assertBuildLogContains("net.nicoulaj.compilecommand.IT01::method10 (1 bytes)   force inline by Compile")
+    }
 
 } catch (Exception e) {
     System.err.println(e.getMessage())

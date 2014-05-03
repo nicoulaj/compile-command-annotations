@@ -29,11 +29,11 @@ public class Sample_02_Compilation {
     //   $ java -cp target/test-classes \
     //          -XX:+UnlockDiagnosticVMOptions \
     //          -XX:+PrintCompilation \
-    //          -XX:CompileCommandFile=src/samples/java/net/nicoulaj/compilecommand/Sample_02_Compilation \
+    //          -XX:CompileCommandFile=src/samples/resources/net/nicoulaj/compilecommand/Sample_02_Compilation \
     //          net.nicoulaj.compilecommand.Sample_02_Compilation
 
     public static void main(String... args) {
-        for (int i = 0; i < 100_000; i++) {
+        for (int i = 0; i < 100000; i++) {
             method01();
             method02();
         }

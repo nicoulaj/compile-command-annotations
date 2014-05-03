@@ -26,7 +26,7 @@ import static java.util.Arrays.asList;
 public class IT01 {
 
     public static void main(String... args) {
-        for (int i = 0; i < 100_000; i++) {
+        for (int i = 0; i < 100000; i++) {
             final IT01 it = new IT01();
             it.method01();
             it.method02(true);

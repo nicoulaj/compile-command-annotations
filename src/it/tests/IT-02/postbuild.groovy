@@ -36,17 +36,19 @@ try {
     helper.assertBuildLogContains("CompilerOracle: dontinline net/nicoulaj/compilecommand/IT02.method10 (Ljava/lang/Boolean;Ljava/lang/Short;Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Float;Ljava/lang/Double;Ljava/lang/Character;Ljava/lang/Byte;)V")
 
     // Check PrintInlining traces
-    helper.assertBuildLogContains("net.nicoulaj.compilecommand.IT02::<init> (5 bytes)   disallowed by CompilerOracle")
-    helper.assertBuildLogContains("net.nicoulaj.compilecommand.IT02::method01 (1 bytes)   disallowed by CompilerOracle")
-    helper.assertBuildLogContains("net.nicoulaj.compilecommand.IT02::method02 (1 bytes)   disallowed by CompilerOracle")
-    helper.assertBuildLogContains("net.nicoulaj.compilecommand.IT02::method03 (1 bytes)   disallowed by CompilerOracle")
-    helper.assertBuildLogContains("net.nicoulaj.compilecommand.IT02::method04 (1 bytes)   disallowed by CompilerOracle")
-    helper.assertBuildLogContains("net.nicoulaj.compilecommand.IT02::method05 (2 bytes)   disallowed by CompilerOracle")
-    helper.assertBuildLogContains("net.nicoulaj.compilecommand.IT02::method06 (1 bytes)   disallowed by CompilerOracle")
-    helper.assertBuildLogContains("net.nicoulaj.compilecommand.IT02::method07 (1 bytes)   disallowed by CompilerOracle")
-    helper.assertBuildLogContains("net.nicoulaj.compilecommand.IT02::method08 (2 bytes)   disallowed by CompilerOracle")
-    helper.assertBuildLogContains("net.nicoulaj.compilecommand.IT02::method09 (1 bytes)   disallowed by CompilerOracle")
-    helper.assertBuildLogContains("net.nicoulaj.compilecommand.IT02::method10 (1 bytes)   disallowed by CompilerOracle")
+    if (!helper.isJava6()) { // PrintInlining does not seem to produce any output on Java 6 production VM
+        helper.assertBuildLogContains("net.nicoulaj.compilecommand.IT02::<init> (5 bytes)   disallowed by Compile")
+        helper.assertBuildLogContains("net.nicoulaj.compilecommand.IT02::method01 (1 bytes)   disallowed by Compile")
+        helper.assertBuildLogContains("net.nicoulaj.compilecommand.IT02::method02 (1 bytes)   disallowed by Compile")
+        helper.assertBuildLogContains("net.nicoulaj.compilecommand.IT02::method03 (1 bytes)   disallowed by Compile")
+        helper.assertBuildLogContains("net.nicoulaj.compilecommand.IT02::method04 (1 bytes)   disallowed by Compile")
+        helper.assertBuildLogContains("net.nicoulaj.compilecommand.IT02::method05 (2 bytes)   disallowed by Compile")
+        helper.assertBuildLogContains("net.nicoulaj.compilecommand.IT02::method06 (1 bytes)   disallowed by Compile")
+        helper.assertBuildLogContains("net.nicoulaj.compilecommand.IT02::method07 (1 bytes)   disallowed by Compile")
+        helper.assertBuildLogContains("net.nicoulaj.compilecommand.IT02::method08 (2 bytes)   disallowed by Compile")
+        helper.assertBuildLogContains("net.nicoulaj.compilecommand.IT02::method09 (1 bytes)   disallowed by Compile")
+        helper.assertBuildLogContains("net.nicoulaj.compilecommand.IT02::method10 (1 bytes)   disallowed by Compile")
+    }
 
 } catch (Exception e) {
     System.err.println(e.getMessage())

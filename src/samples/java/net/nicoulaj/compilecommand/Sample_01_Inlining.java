@@ -29,11 +29,11 @@ public class Sample_01_Inlining {
     //   $ java -cp target/test-classes \
     //          -XX:+UnlockDiagnosticVMOptions \
     //          -XX:+PrintInlining \
-    //          -XX:CompileCommandFile=src/samples/java/net/nicoulaj/compilecommand/Sample_01_Inlining \
+    //          -XX:CompileCommandFile=src/samples/resources/net/nicoulaj/compilecommand/Sample_01_Inlining \
     //          net.nicoulaj.compilecommand.Sample_01_Inlining
 
     public static void main(String... args) {
-        for (int i = 0; i < 100_000; i++) {
+        for (int i = 0; i < 100000; i++) {
             method01();
             method02();
         }

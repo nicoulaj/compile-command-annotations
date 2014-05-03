@@ -17,14 +17,13 @@
 
 package net.nicoulaj.compilecommand.testcases;
 
-import net.nicoulaj.compilecommand.annotations.Option;
 import net.nicoulaj.compilecommand.annotations.Options;
 
 public class Test21 {
 
-    @Options({@Option("UseSuperWord=true"),
-              @Option("PrintIntrinsics=true"),
-              @Option("EliminateAutoBox=true")})
+    @Options({"UseSuperWord=true",
+             "PrintIntrinsics=true",
+             "EliminateAutoBox=true"})
     public void method01() {
     }
 }

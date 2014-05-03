@@ -22,7 +22,7 @@ import net.nicoulaj.compilecommand.annotations.*;
 public class IT03 {
 
     public static void main(String... args) {
-        for (int i = 0; i < 100_000; i++) {
+        for (int i = 0; i < 100000; i++) {
             final IT03 it = new IT03();
             it.method01();
         }
@@ -34,9 +34,9 @@ public class IT03 {
 
     @Print
     @Log
-    @Option("UseSuperWord=true")
-    @Option("PrintIntrinsics=true")
-    @Option("EliminateAutoBox=true")
+    @Options({"UseSuperWord=true",
+              "PrintIntrinsics=true",
+              "EliminateAutoBox=true"})
     private void method01() {
     }
 }

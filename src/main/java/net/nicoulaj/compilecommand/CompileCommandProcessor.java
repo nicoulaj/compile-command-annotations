@@ -18,9 +18,11 @@
 package net.nicoulaj.compilecommand;
 
 import net.nicoulaj.compilecommand.annotations.*;
-import org.kohsuke.MetaInfServices;
 
-import javax.annotation.processing.*;
+import javax.annotation.processing.AbstractProcessor;
+import javax.annotation.processing.Processor;
+import javax.annotation.processing.RoundEnvironment;
+import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
@@ -29,8 +31,8 @@ import javax.lang.model.type.ArrayType;
 import javax.lang.model.type.NoType;
 import javax.lang.model.type.PrimitiveType;
 import javax.lang.model.type.TypeMirror;
-import javax.lang.model.util.SimpleElementVisitor8;
-import javax.lang.model.util.SimpleTypeVisitor8;
+import javax.lang.model.util.SimpleElementVisitor6;
+import javax.lang.model.util.SimpleTypeVisitor6;
 import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 import javax.tools.FileObject;
@@ -38,12 +40,13 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.lang.annotation.Annotation;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 import static java.lang.String.format;
-import static javax.lang.model.SourceVersion.RELEASE_8;
+import static java.util.Arrays.asList;
 import static javax.tools.Diagnostic.Kind.*;
 import static javax.tools.StandardLocation.CLASS_OUTPUT;
 
@@ -53,18 +56,6 @@ import static javax.tools.StandardLocation.CLASS_OUTPUT;
  * @author <a href="http://github.com/nicoulaj">Julien Nicoulaud</a>
  * @see <a href="http://docs.oracle.com/javase/8/docs/technotes/tools/unix/java.html"><code>CompileCommand</code>/<code>CompileCommandFile</code> documentation</a>
  */
-@MetaInfServices(Processor.class)
-@SupportedSourceVersion(RELEASE_8)
-@SupportedAnnotationTypes({"net.nicoulaj.compilecommand.annotations.Break",
-                           "net.nicoulaj.compilecommand.annotations.CompileOnly",
-                           "net.nicoulaj.compilecommand.annotations.DontInline",
-                           "net.nicoulaj.compilecommand.annotations.Exclude",
-                           "net.nicoulaj.compilecommand.annotations.Inline",
-                           "net.nicoulaj.compilecommand.annotations.Log",
-                           "net.nicoulaj.compilecommand.annotations.Option",
-                           "net.nicoulaj.compilecommand.annotations.Options",
-                           "net.nicoulaj.compilecommand.annotations.Print",
-                           "net.nicoulaj.compilecommand.annotations.Quiet"})
 @SuppressWarnings("unused")
 public final class CompileCommandProcessor extends AbstractProcessor {
 
@@ -77,7 +68,28 @@ public final class CompileCommandProcessor extends AbstractProcessor {
     private boolean quiet = false;
 
     public CompileCommandProcessor() {
-        lines = new TreeSet<>();
+        lines = new TreeSet<String>();
+    }
+
+    @Override
+    public SourceVersion getSupportedSourceVersion() {
+        return SourceVersion.latest();
+    }
+
+    @Override
+    public Set<String> getSupportedAnnotationTypes() {
+        return new HashSet<String>(asList(
+                Break.class.getName(),
+                CompileOnly.class.getName(),
+                DontInline.class.getName(),
+                Exclude.class.getName(),
+                Inline.class.getName(),
+                Log.class.getName(),
+                Option.class.getName(),
+                Options.class.getName(),
+                Print.class.getName(),
+                Quiet.class.getName()
+        ));
     }
 
     @Override
@@ -96,8 +108,11 @@ public final class CompileCommandProcessor extends AbstractProcessor {
         processPrint(roundEnv);
         processQuiet(roundEnv);
 
-        if (roundEnv.processingOver())
-            generateCompileCommandFile(processingEnv.getOptions().getOrDefault(COMPILE_COMMAND_FILE_PATH_OPTION, COMPILE_COMMAND_FILE_PATH_DEFAULT));
+        if (!roundEnv.processingOver())
+            return true;
+
+        final String outputPath = processingEnv.getOptions().get(COMPILE_COMMAND_FILE_PATH_OPTION);
+        generateCompileCommandFile(outputPath != null ? outputPath : COMPILE_COMMAND_FILE_PATH_DEFAULT);
 
         info("Done processing compiler hints annotations");
 
@@ -130,29 +145,29 @@ public final class CompileCommandProcessor extends AbstractProcessor {
 
     private void processOptions(RoundEnvironment roundEnv) {
         for (Element element : roundEnv.getElementsAnnotatedWith(Options.class))
-            for (Option option : element.getAnnotation(Options.class).value())
+            for (String option : element.getAnnotation(Options.class).value())
                 processOption(element, option, roundEnv);
     }
 
     private void processOption(RoundEnvironment roundEnv) {
         for (Element element : roundEnv.getElementsAnnotatedWith(Option.class))
-            processOption(element, element.getAnnotation(Option.class), roundEnv);
+            processOption(element, element.getAnnotation(Option.class).value(), roundEnv);
     }
 
-    private void processOption(Element element, Option option, RoundEnvironment roundEnv) {
-        lines.add(element.accept(new SimpleElementVisitor8<String, RoundEnvironment>() {
+    private void processOption(final Element element, String option, RoundEnvironment roundEnv) {
+        lines.add(element.accept(new SimpleElementVisitor6<String, String>() {
 
             @Override
-            public String visitExecutable(final ExecutableElement e, final RoundEnvironment roundEnvironment) {
-                return Option.class.getSimpleName().toLowerCase() + " " + getDescriptor(e) + " " + option.value();
+            public String visitExecutable(final ExecutableElement e, final String option) {
+                return Option.class.getSimpleName().toLowerCase() + " " + getDescriptor(e) + " " + option;
             }
 
             @Override
-            protected String defaultAction(final Element e, final RoundEnvironment roundEnvironment) {
-                error(e, "@%s is not allowed on a %s", Option.class.getSimpleName(), e.getKind());
+            protected String defaultAction(final Element e, final String option) {
+                error(element, "@%s is not allowed on a %s", Option.class.getSimpleName(), e.getKind());
                 return null;
             }
-        }, roundEnv));
+        }, option));
     }
 
     private void processPrint(RoundEnvironment roundEnv) {
@@ -164,9 +179,9 @@ public final class CompileCommandProcessor extends AbstractProcessor {
             quiet = true;
     }
 
-    private void processSimpleMethodAnnotation(Class<? extends Annotation> clazz, RoundEnvironment roundEnv) {
+    private void processSimpleMethodAnnotation(final Class<? extends Annotation> clazz, RoundEnvironment roundEnv) {
         for (Element element : roundEnv.getElementsAnnotatedWith(clazz))
-            lines.add(element.accept(new SimpleElementVisitor8<String, RoundEnvironment>() {
+            lines.add(element.accept(new SimpleElementVisitor6<String, RoundEnvironment>() {
 
                 @Override
                 public String visitExecutable(final ExecutableElement e, final RoundEnvironment roundEnvironment) {
@@ -198,29 +213,20 @@ public final class CompileCommandProcessor extends AbstractProcessor {
     }
 
     private String getSignature(TypeMirror type) {
-        return type.accept(new SimpleTypeVisitor8<String, Void>() {
+        return type.accept(new SimpleTypeVisitor6<String, Void>() {
 
             @Override
-            public String visitPrimitive(final PrimitiveType t, final Void aVoid) {
-                switch (t.toString()) {
-                case "boolean":
-                    return "Z";
-                case "short":
-                    return "S";
-                case "int":
-                    return "I";
-                case "long":
-                    return "J";
-                case "float":
-                    return "F";
-                case "double":
-                    return "D";
-                case "char":
-                    return "C";
-                case "byte":
-                    return "B";
-                }
-                return super.visitPrimitive(t, aVoid);
+            public String visitPrimitive(final PrimitiveType t, final Void dummy) {
+                final String type = t.toString();
+                if ("boolean".equals(type)) return "Z";
+                if ("short".equals(type)) return "S";
+                if ("int".equals(type)) return "I";
+                if ("long".equals(type)) return "J";
+                if ("float".equals(type)) return "F";
+                if ("double".equals(type)) return "D";
+                if ("char".equals(type)) return "C";
+                if ("byte".equals(type)) return "B";
+                return super.visitPrimitive(t, dummy);
             }
 
             @Override public String visitNoType(final NoType t, final Void aVoid) {
@@ -240,16 +246,20 @@ public final class CompileCommandProcessor extends AbstractProcessor {
     }
 
     private void generateCompileCommandFile(String path) {
+        info("Writing compiler command file at %s", path);
+        PrintWriter pw = null;
         try {
-            info("Writing compiler command file at %s", path);
             final FileObject file = processingEnv.getFiler().createResource(CLASS_OUTPUT, "", path);
-            try (PrintWriter pw = new PrintWriter(new OutputStreamWriter(file.openOutputStream(), "UTF-8"))) {
-                if (quiet) pw.println("quiet");
-                for (String value : lines)
-                    pw.println(value);
-            }
+            pw = new PrintWriter(new OutputStreamWriter(file.openOutputStream(), "UTF-8"));
+            if (quiet) pw.println("quiet");
+            for (String value : lines)
+                pw.println(value);
+            pw.flush();
         } catch (IOException e) {
             error("Failed writing compiler command file : %s", e);
+        } finally {
+            if (pw != null)
+                pw.close();
         }
     }
 
