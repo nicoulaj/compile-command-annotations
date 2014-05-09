@@ -1,27 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  ~ Copyright 2014 Julien Nicoulaud <julien.nicoulaud@gmail.com>
-  ~
-  ~ This program is free software: you can redistribute it and/or modify
-  ~ it under the terms of the GNU General Public License as published by
-  ~ the Free Software Foundation, either version 3 of the License, or
-  ~ (at your option) any later version.
-  ~
-  ~ This program is distributed in the hope that it will be useful,
-  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  ~ GNU General Public License for more details.
-  ~
-  ~ You should have received a copy of the GNU General Public License
-  ~ along with this program.  If not, see <http://www.gnu.org/licenses />.
-  -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>net.ju-n</groupId>
     <artifactId>net-ju-n-parent</artifactId>
-    <version>28</version>
+    <version>31</version>
   </parent>
 
   <groupId>net.ju-n.compile-command-annotations</groupId>
@@ -32,13 +16,6 @@
   <inceptionYear>2014</inceptionYear>
   <description>Annotation based configuration file generator for the Hotspot JVM JIT compiler.</description>
   <url>http://nicoulaj.github.com/compile-command-annotations</url>
-
-  <licenses>
-    <license>
-      <name>LGPL 3.0</name>
-      <url>https://www.gnu.org/licenses/lgpl.html</url>
-    </license>
-  </licenses>
 
   <scm>
     <url>http://github.com/nicoulaj/compile-command-annotations</url>
@@ -53,7 +30,7 @@
   </issueManagement>
 
   <ciManagement>
-    <system>Cloudbees BuildHive</system>
+    <system>Travis CI</system>
     <url>http://travis-ci.org/nicoulaj/compile-command-annotations</url>
   </ciManagement>
 
@@ -65,6 +42,7 @@
   </distributionManagement>
 
   <properties>
+    <license>lgpl_v3</license>
     <java.level>1.6</java.level>
     <guava.version>17.0</guava.version>
     <fest-assert.version>2.0M10</fest-assert.version>
@@ -121,6 +99,8 @@
       <plugin>
         <artifactId>maven-invoker-plugin</artifactId>
         <configuration>
+          <skipInstallation>${skipTests}</skipInstallation>
+          <skipInvocation>${skipTests}</skipInvocation>
           <localRepositoryPath>${project.build.directory}/it/local-repository</localRepositoryPath>
           <showErrors>true</showErrors>
           <settingsFile>src/it/settings.xml</settingsFile>
@@ -147,85 +127,7 @@
           </execution>
         </executions>
       </plugin>
-      <plugin>
-        <artifactId>maven-site-plugin</artifactId>
-        <dependencies>
-          <dependency>
-            <groupId>org.apache.maven.doxia</groupId>
-            <artifactId>doxia-module-markdown</artifactId>
-            <version>${doxia-module-markdown.version}</version>
-          </dependency>
-          <dependency>
-            <groupId>org.kohsuke</groupId>
-            <artifactId>wagon-gitsite</artifactId>
-            <version>${wagon-gitsite.version}</version>
-          </dependency>
-        </dependencies>
-      </plugin>
     </plugins>
   </build>
-
-  <reporting>
-    <plugins>
-      <plugin>
-        <artifactId>maven-site-plugin</artifactId>
-        <version>${maven-site-plugin.version}</version>
-      </plugin>
-      <plugin>
-        <artifactId>maven-project-info-reports-plugin</artifactId>
-        <version>${maven-project-info-reports-plugin.version}</version>
-      </plugin>
-      <plugin>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <version>${maven-javadoc-plugin.version}</version>
-      </plugin>
-      <plugin>
-        <artifactId>maven-jxr-plugin</artifactId>
-        <version>${maven-jxr-plugin.version}</version>
-      </plugin>
-      <plugin>
-        <artifactId>maven-surefire-report-plugin</artifactId>
-        <version>${maven-surefire-report-plugin.version}</version>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>taglist-maven-plugin</artifactId>
-        <version>${taglist-maven-plugin.version}</version>
-        <configuration>
-          <tagListOptions>
-            <tagClasses>
-              <tagClass>
-                <displayName>TODO tags</displayName>
-                <tags>
-                  <tag>
-                    <matchString>todo</matchString>
-                    <matchType>ignoreCase</matchType>
-                  </tag>
-                </tags>
-              </tagClass>
-              <tagClass>
-                <displayName>FIXME tags</displayName>
-                <tags>
-                  <tag>
-                    <matchString>fixme</matchString>
-                    <matchType>ignoreCase</matchType>
-                  </tag>
-                </tags>
-              </tagClass>
-            </tagClasses>
-          </tagListOptions>
-        </configuration>
-      </plugin>
-      <plugin>
-        <artifactId>maven-changelog-plugin</artifactId>
-        <version>${maven-changelog-plugin.version}</version>
-        <configuration>
-          <displayChangeSetDetailUrl>${project.scm.url}/commit/%REV%</displayChangeSetDetailUrl>
-          <displayFileDetailUrl>${project.scm.url}/tree/master/%FILE%</displayFileDetailUrl>
-          <displayFileRevDetailUrl>${project.scm.url}/blob/%REV%/%FILE%</displayFileRevDetailUrl>
-        </configuration>
-      </plugin>
-    </plugins>
-  </reporting>
 
 </project>
