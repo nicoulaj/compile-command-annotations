@@ -42,7 +42,7 @@
   </distributionManagement>
 
   <properties>
-    <license>lgpl_v3</license>
+    <license>apache_v2</license>
     <java.level>1.6</java.level>
     <guava.version>17.0</guava.version>
     <fest-assert.version>2.0M10</fest-assert.version>
