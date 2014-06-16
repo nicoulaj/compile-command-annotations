@@ -46,6 +46,7 @@
     <java.level>1.6</java.level>
     <guava.version>17.0</guava.version>
     <fest-assert.version>2.0M10</fest-assert.version>
+    <commons-io.version>2.4</commons-io.version>
   </properties>
 
   <dependencies>
@@ -58,6 +59,12 @@
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
       <version>${guava.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>${commons-io.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
