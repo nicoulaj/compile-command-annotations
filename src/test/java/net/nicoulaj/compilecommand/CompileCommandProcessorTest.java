@@ -33,7 +33,7 @@ import static net.nicoulaj.compilecommand.CompileCommandProcessor.COMPILE_COMMAN
 import static net.nicoulaj.compilecommand.JavaCompilationTester.Report;
 import static org.apache.commons.io.FilenameUtils.getBaseName;
 import static org.apache.commons.io.FilenameUtils.getExtension;
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 

@@ -45,7 +45,7 @@
     <license>apache_v2</license>
     <java.level>1.6</java.level>
     <guava.version>17.0</guava.version>
-    <fest-assert.version>2.0M10</fest-assert.version>
+    <assertj-core.version>2.2.0</assertj-core.version>
     <commons-io.version>2.4</commons-io.version>
   </properties>
 
@@ -68,9 +68,9 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.easytesting</groupId>
-      <artifactId>fest-assert-core</artifactId>
-      <version>${fest-assert.version}</version>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <version>${assertj-core.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
