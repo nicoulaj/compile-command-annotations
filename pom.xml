@@ -3,9 +3,9 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>net.ju-n</groupId>
-    <artifactId>net-ju-n-parent</artifactId>
-    <version>38</version>
+    <groupId>net.nicoulaj</groupId>
+    <artifactId>parent</artifactId>
+    <version>48</version>
   </parent>
 
   <groupId>net.ju-n.compile-command-annotations</groupId>
@@ -44,8 +44,8 @@
   <properties>
     <license>apache_v2</license>
     <java.level>1.6</java.level>
-    <guava.version>19.0</guava.version>
-    <assertj-core.version>3.4.1</assertj-core.version>
+    <guava.version>21.0</guava.version>
+    <assertj-core.version>3.6.2</assertj-core.version>
     <commons-io.version>2.5</commons-io.version>
   </properties>
 
