@@ -8,14 +8,14 @@
     <version>48</version>
   </parent>
 
-  <groupId>net.ju-n.compile-command-annotations</groupId>
+  <groupId>net.nicoulaj.compile-command-annotations</groupId>
   <artifactId>compile-command-annotations</artifactId>
   <version>1.2.1-SNAPSHOT</version>
 
   <name>Hotspot compile command annotations</name>
   <inceptionYear>2014</inceptionYear>
   <description>Annotation based configuration file generator for the Hotspot JVM JIT compiler.</description>
-  <url>http://nicoulaj.github.com/compile-command-annotations</url>
+  <url>http://compile-command-annotations.nicoulaj.net</url>
 
   <scm>
     <url>http://github.com/nicoulaj/compile-command-annotations</url>
