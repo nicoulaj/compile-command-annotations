@@ -4,10 +4,13 @@ sudo: false
 jdk:
   - oraclejdk8
 
-script: mvn clean verify -Ddebug=true
+before_script:
+  - export MAVEN_SKIP_RC=true
 
-after_success:
-  - bash <(curl -s https://codecov.io/bash)
+script: mvn clean verify
 
 after_script:
   - cat target/it/tests/IT-*/build.log
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
