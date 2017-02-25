@@ -7,9 +7,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -61,7 +61,11 @@ import static javax.tools.StandardLocation.CLASS_OUTPUT;
 @SuppressWarnings("unused")
 public final class CompileCommandProcessor extends AbstractProcessor {
 
+    public static final String COMPILE_COMMAND_FILE_CHARSET_OPTION = "compile.command.file.output.charset";
+
     public static final String COMPILE_COMMAND_FILE_PATH_OPTION = "compile.command.file.output.path";
+
+    public static final String COMPILE_COMMAND_FILE_CHARSET_DEFAULT = "UTF-8";
 
     public static final String COMPILE_COMMAND_FILE_PATH_DEFAULT = "META-INF/hotspot_compiler";
 
@@ -97,7 +101,7 @@ public final class CompileCommandProcessor extends AbstractProcessor {
     @Override
     public boolean process(final Set<? extends TypeElement> annotations, final RoundEnvironment roundEnv) {
 
-        info("Processing compiler hints annotations");
+        message(NOTE, "Processing compiler hints annotations");
 
         processBreak(roundEnv);
         processCompileOnly(roundEnv);
@@ -114,9 +118,13 @@ public final class CompileCommandProcessor extends AbstractProcessor {
             return true;
 
         final String outputPath = processingEnv.getOptions().get(COMPILE_COMMAND_FILE_PATH_OPTION);
-        generateCompileCommandFile(outputPath != null ? outputPath : COMPILE_COMMAND_FILE_PATH_DEFAULT);
+        final String charset = processingEnv.getOptions().get(COMPILE_COMMAND_FILE_CHARSET_OPTION);
+        generateCompileCommandFile(
+            outputPath != null ? outputPath : COMPILE_COMMAND_FILE_PATH_DEFAULT,
+            charset != null ? charset : COMPILE_COMMAND_FILE_CHARSET_DEFAULT
+        );
 
-        info("Done processing compiler hints annotations");
+        message(NOTE, "Done processing compiler hints annotations");
 
         return true;
     }
@@ -164,11 +172,6 @@ public final class CompileCommandProcessor extends AbstractProcessor {
                 return Option.class.getSimpleName().toLowerCase() + " " + getDescriptor(e) + " " + option;
             }
 
-            @Override
-            protected String defaultAction(final Element e, final String option) {
-                error(element, "@%s is not allowed on a %s", Option.class.getSimpleName(), e.getKind());
-                return null;
-            }
         }, option));
     }
 
@@ -190,11 +193,6 @@ public final class CompileCommandProcessor extends AbstractProcessor {
                     return clazz.getSimpleName().toLowerCase() + " " + getDescriptor(e);
                 }
 
-                @Override
-                protected String defaultAction(final Element e, final RoundEnvironment roundEnvironment) {
-                    error(e, "@%s is not allowed on a %s", clazz.getSimpleName(), e.getKind());
-                    return null;
-                }
             }, roundEnv));
     }
 
@@ -247,53 +245,25 @@ public final class CompileCommandProcessor extends AbstractProcessor {
         }, null);
     }
 
-    private void generateCompileCommandFile(String path) {
-        info("Writing compiler command file at %s", path);
+    private void generateCompileCommandFile(String path, String charset) {
+        message(NOTE, "Writing compiler command file at %s", path);
         PrintWriter pw = null;
         try {
             final FileObject file = processingEnv.getFiler().createResource(CLASS_OUTPUT, "", path);
-            pw = new PrintWriter(new OutputStreamWriter(file.openOutputStream(), "UTF-8"));
+            pw = new PrintWriter(new OutputStreamWriter(file.openOutputStream(), charset));
             if (quiet) pw.println("quiet");
             for (String value : lines)
                 pw.println(value);
             pw.flush();
         } catch (IOException e) {
-            error("Failed writing compiler command file : %s", e);
+            throw new RuntimeException("Failed writing compiler command file at " + path, e);
         } finally {
             if (pw != null)
                 pw.close();
         }
     }
 
-    private void info(String msg, Object... args) {
-        message(NOTE, msg, args);
-    }
-
-    private void info(Element element, String msg, Object... args) {
-        message(NOTE, element, msg, args);
-    }
-
-    private void warn(String msg, Object... args) {
-        message(WARNING, msg, args);
-    }
-
-    private void warn(Element element, String msg, Object... args) {
-        message(WARNING, element, msg, args);
-    }
-
-    private void error(String msg, Object... args) {
-        message(ERROR, msg, args);
-    }
-
-    private void error(Element element, String msg, Object... args) {
-        message(ERROR, element, msg, args);
-    }
-
     private void message(Diagnostic.Kind level, String msg, Object... args) {
         processingEnv.getMessager().printMessage(level, format(msg, args));
-    }
-
-    private void message(Diagnostic.Kind level, Element element, String msg, Object... args) {
-        processingEnv.getMessager().printMessage(level, format(msg, args), element);
     }
 }
