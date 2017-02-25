@@ -43,6 +43,7 @@
 
   <properties>
     <license>apache_v2</license>
+    <debug>false</debug>
     <java.level>1.6</java.level>
     <guava.version>21.0</guava.version>
     <assertj-core.version>3.6.2</assertj-core.version>
@@ -106,6 +107,7 @@
       <plugin>
         <artifactId>maven-invoker-plugin</artifactId>
         <configuration>
+          <debug>${debug}</debug>
           <skipInstallation>${skipTests}</skipInstallation>
           <skipInvocation>${skipTests}</skipInvocation>
           <localRepositoryPath>${project.build.directory}/it/local-repository</localRepositoryPath>

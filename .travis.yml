@@ -4,9 +4,10 @@ sudo: false
 jdk:
   - oraclejdk8
 
-script: mvn clean verify
+script: mvn clean verify -Ddebug=true
 
 after_success:
-  - ls -lR target
-  - ls -lR /home/travis/.m2/repository/org/jacoco/org.jacoco.agent/0.7.7.201606060606/
   - bash <(curl -s https://codecov.io/bash)
+
+after_script:
+  - cat target/it/tests/IT-*/build.log
