@@ -19,6 +19,7 @@ package net.nicoulaj.compilecommand;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
+import java.nio.charset.Charset;
 import java.util.Map;
 
 /**
@@ -125,7 +126,7 @@ public final class ITAssert {
      * @throws Exception if conditions are not fulfilled.
      */
     public void assertFileContains(String path, String search) throws Exception {
-        if (!FileUtils.readFileToString(new File(baseDirectory, path)).contains(search))
+        if (!FileUtils.readFileToString(new File(baseDirectory, path), Charset.defaultCharset()).contains(search))
             throw new Exception(path + " does not contain '" + search + "'.");
     }
 
@@ -147,7 +148,7 @@ public final class ITAssert {
      * @throws Exception if conditions are not fulfilled.
      */
     public void assertFileDoesNotContain(String path, String search) throws Exception {
-        if (FileUtils.readFileToString(new File(baseDirectory, path)).contains(search))
+        if (FileUtils.readFileToString(new File(baseDirectory, path), Charset.defaultCharset()).contains(search))
             throw new Exception(path + " contains '" + search + "'.");
     }
 
