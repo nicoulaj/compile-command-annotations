@@ -172,31 +172,4 @@ public final class ITAssert {
         final File f = new File(baseDirectory, file);
         if (f.exists() && f.isFile()) f.delete();
     }
-
-    /**
-     * Test if currently running JVM is version 6.
-     *
-     * @return {@code true} if running on Java 6
-     */
-    public boolean isJava6() {
-        return "1.6".equals(System.getProperty("java.specification.version"));
-    }
-
-    /**
-     * Test if currently running JVM is version 7.
-     *
-     * @return {@code true} if running on Java 7
-     */
-    public boolean isJava7() {
-        return "1.7".equals(System.getProperty("java.specification.version"));
-    }
-
-    /**
-     * Test if currently running JVM is version 8.
-     *
-     * @return {@code true} if running on Java 8
-     */
-    public boolean isJava8() {
-        return "1.8".equals(System.getProperty("java.specification.version"));
-    }
 }

@@ -23,14 +23,12 @@ try {
     helper.assertFileIsNotEmpty("target/classes/META-INF/hotspot_compiler")
 
     // Check startup traces
-    helper.assertBuildLogDoesNotContain("CompilerOracle: unrecognized line")
-    helper.assertBuildLogDoesNotContain("CompilerOracle: exclude net/nicoulaj/compilecommand/IT03.<init> ()V")
+    helper.assertBuildLogDoesNotContain(": unrecognized line")
+    helper.assertBuildLogDoesNotContain(": exclude net/nicoulaj/compilecommand/IT03.<init>")
 
     // Check PrintInlining/LogCompilation traces
-    if (!helper.isJava6()) { // PrintInlining does not seem to produce any output on Java 6 production VM
-        helper.assertBuildLogContains("net.nicoulaj.compilecommand.IT03::<init> (5 bytes)")
-        helper.assertBuildLogContains("Compiled method")
-    }
+    helper.assertBuildLogContains("net.nicoulaj.compilecommand.IT03::<init> (5 bytes)")
+    helper.assertBuildLogContains("Compiled method")
 
 } catch (Exception e) {
     System.err.println(e.getMessage())

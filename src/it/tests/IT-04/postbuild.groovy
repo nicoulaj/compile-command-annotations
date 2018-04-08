@@ -23,8 +23,8 @@ try {
     helper.assertFileIsNotEmpty("target/classes/my-compile-command-file")
 
     // Check startup traces
-    helper.assertBuildLogDoesNotContain("CompilerOracle: unrecognized line")
-    helper.assertBuildLogContains("CompilerOracle: inline net/nicoulaj/compilecommand/IT04.<init> ()V")
+    helper.assertBuildLogDoesNotContain(": unrecognized line")
+    helper.assertBuildLogContains(": inline net/nicoulaj/compilecommand/IT04.<init>")
 
 } catch (Exception e) {
     System.err.println(e.getMessage())
