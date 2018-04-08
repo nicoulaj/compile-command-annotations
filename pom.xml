@@ -63,9 +63,9 @@
     <license>apache_v2</license>
     <debug>false</debug>
     <java.level>1.6</java.level>
-    <guava.version>21.0</guava.version>
-    <assertj-core.version>3.6.2</assertj-core.version>
-    <commons-io.version>2.5</commons-io.version>
+    <guava.version>24.1-jre</guava.version>
+    <assertj-core.version>3.9.1</assertj-core.version>
+    <commons-io.version>2.6</commons-io.version>
   </properties>
 
   <dependencies>
