@@ -23,7 +23,7 @@
   <parent>
     <groupId>net.nicoulaj</groupId>
     <artifactId>parent</artifactId>
-    <version>53</version>
+    <version>54</version>
   </parent>
 
   <groupId>net.nicoulaj.compile-command-annotations</groupId>
@@ -63,8 +63,8 @@
     <license>apache_v2</license>
     <debug>false</debug>
     <java.level>1.6</java.level>
-    <guava.version>24.1-jre</guava.version>
-    <assertj-core.version>3.9.1</assertj-core.version>
+    <guava.version>26.0-jre</guava.version>
+    <assertj-core.version>3.11.1</assertj-core.version>
     <commons-io.version>2.6</commons-io.version>
   </properties>
 
