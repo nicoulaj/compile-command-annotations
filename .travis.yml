@@ -3,19 +3,14 @@ sudo: false
 
 jdk:
   - oraclejdk8
-  - openjdk8
-  - oraclejdk9
-  - openjdk9
-  - oraclejdk10
-  - openjdk10
   - oraclejdk11
+  - openjdk8
+  - openjdk9
+  - openjdk10
   - openjdk11
 
 matrix:
   fast_finish: true
-  allow_failures:
-  - jdk: oraclejdk11
-  - jdk: openjdk11
 
 cache:
     directories:
