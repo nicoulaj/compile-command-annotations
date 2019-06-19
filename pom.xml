@@ -28,7 +28,7 @@
 
   <groupId>net.nicoulaj.compile-command-annotations</groupId>
   <artifactId>compile-command-annotations</artifactId>
-  <version>1.2.2</version>
+  <version>1.2.3-SNAPSHOT</version>
 
   <name>Hotspot compile command annotations</name>
   <inceptionYear>2014</inceptionYear>
@@ -39,7 +39,7 @@
     <url>http://github.com/nicoulaj/compile-command-annotations</url>
     <connection>scm:git:git@github.com:nicoulaj/compile-command-annotations.git</connection>
     <developerConnection>scm:git:git@github.com:nicoulaj/compile-command-annotations.git</developerConnection>
-    <tag>1.2.2</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <issueManagement>
