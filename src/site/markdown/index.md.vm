@@ -59,3 +59,58 @@ Usage
  * You can then run your program using the compile command file:
 
         java -XX:CompileCommandFile:target/classes/META-INF/hotspot_compiler ...
+
+
+Incremental compilation support for Gradle
+------------------------------------------
+
+Incremental compilation in Gradle with this annotation processor requires a few tweaks to work properly.
+The compile-command-annotations-processor needs to write multiple files to be compatible with incremental
+compilation. This is enabled with the `-Acompile.command.incremental.output=COMPILE_COMMAND_INCREMENTAL`
+compiler option. Gradle can then associate and manage these files produced by compile-command-annotations
+with the Java source files. A helper task is then needed to merge all these files into a single
+`hotspot_compiler` file that can be consumed by a compatible JVM.
+
+In your module's `build.gradle`:
+
+        buildscript {
+            // note: omitting mandatory repository configuration in this snippet
+            dependencies {
+                classpath("net.nicoulaj.compile-command-annotations:compile-command-annotations:1.2.3")
+            }
+        }
+
+        import net.nicoulaj.compilecommand.IncrementalCompilationHelper
+
+        dependencies {
+            annotationProcessor("net.nicoulaj.compile-command-annotations:compile-command-annotations:1.2.3")
+            compileOnly("net.nicoulaj.compile-command-annotations:compile-command-annotations:1.2.3")
+        }
+
+        // Have a task that takes the incremental files and merges these into a single hotspot_compiler file.
+        // The helper method IncrementalCompilationHelper.mergeIncrementalFiles ensures that the result file
+        // is deterministic and that the (optional) 'quiet command' is the first in the output file.
+        tasks.register("copyHotspotCompiler", DefaultTask) { DefaultTask t ->
+            t.inputs.files(fileTree("${sourceSets.main.java.outputDir}/COMPILE_COMMAND_INCREMENTAL"))
+            t.outputs.file("conf/hotspot_compiler")
+            t.doLast({
+                IncrementalCompilationHelper.mergeIncrementalFiles(file("${sourceSets.main.java.outputDir}/COMPILE_COMMAND_INCREMENTAL"), file("conf/hotspot_compiler"))
+            })
+        }
+
+        tasks.named("compileJava") { JavaCompile t ->
+            // Tell the compile-command-annotations-processor to write the incremental files
+            // to the COMPILE_COMMAND_INCREMENTAL directory.
+            t.options.compilerArgs += ["-Acompile.command.incremental.output=COMPILE_COMMAND_INCREMENTAL"]
+            t.finalizedBy(tasks.named("copyHotspotCompiler"))
+        }
+
+        // exclude the COMPILE_COMMAND_INCREMENTAL directory from the generated jar
+        tasks.named("jar") { Jar t ->
+            t.exclude("COMPILE_COMMAND_INCREMENTAL/**")
+        }
+
+
+Gradle will fall back to full compilation without these tweaks, because incremental compilation needs exactly one
+"element" in the source tree for every output file. Since without these tweaks the single `hotspot_compiler` file
+would have 0 elements, incremental compilation would not work.
