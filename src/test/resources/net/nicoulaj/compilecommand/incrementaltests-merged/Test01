@@ -1,0 +1,7 @@
+quiet
+dontinline net.nicoulaj.compilecommand.incrementaltests.Test01::bar ()V
+inline net.nicoulaj.compilecommand.incrementaltests.Test01::abc ()V
+inline net.nicoulaj.compilecommand.incrementaltests.Test01::foo ()V
+option net.nicoulaj.compilecommand.incrementaltests.Test01::abc ()V some_option
+option net.nicoulaj.compilecommand.incrementaltests.Test01::bar ()V option_a
+option net.nicoulaj.compilecommand.incrementaltests.Test01::bar ()V option_b

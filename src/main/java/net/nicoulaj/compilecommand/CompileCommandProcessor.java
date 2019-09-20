@@ -59,19 +59,20 @@ import static javax.tools.StandardLocation.CLASS_OUTPUT;
 public final class CompileCommandProcessor extends AbstractProcessor {
 
     public static final String COMPILE_COMMAND_FILE_CHARSET_OPTION = "compile.command.file.output.charset";
-
-    public static final String COMPILE_COMMAND_FILE_PATH_OPTION = "compile.command.file.output.path";
-
     public static final String COMPILE_COMMAND_FILE_CHARSET_DEFAULT = "UTF-8";
 
+    public static final String COMPILE_COMMAND_FILE_PATH_OPTION = "compile.command.file.output.path";
     public static final String COMPILE_COMMAND_FILE_PATH_DEFAULT = "META-INF/hotspot_compiler";
 
-    private final SortedSet<String> lines;
+    public static final String COMPILE_COMMAND_INCREMENTAL_OUTPUT_OPTION = "compile.command.incremental.output";
 
-    private boolean quiet = false;
+    private String compileCommandsDir;
+    private String charset;
+
+    private final SortedSet<Line> lines;
 
     public CompileCommandProcessor() {
-        lines = new TreeSet<String>();
+        lines = new TreeSet<Line>();
     }
 
     @Override
@@ -96,9 +97,24 @@ public final class CompileCommandProcessor extends AbstractProcessor {
     }
 
     @Override
+    public Set<String> getSupportedOptions()
+    {
+        Set<String> supportedOptions = new HashSet<String>();
+        supportedOptions.add(COMPILE_COMMAND_FILE_CHARSET_OPTION);
+        supportedOptions.add(COMPILE_COMMAND_FILE_PATH_OPTION);
+        supportedOptions.add(COMPILE_COMMAND_INCREMENTAL_OUTPUT_OPTION);
+        return supportedOptions;
+    }
+
+    @Override
     public boolean process(final Set<? extends TypeElement> annotations, final RoundEnvironment roundEnv) {
 
         message(NOTE, "Processing compiler hints annotations");
+
+        this.compileCommandsDir = processingEnv.getOptions().get(COMPILE_COMMAND_INCREMENTAL_OUTPUT_OPTION);
+        this.charset = processingEnv.getOptions().get(COMPILE_COMMAND_FILE_CHARSET_OPTION);
+        if (this.charset == null)
+            this.charset = COMPILE_COMMAND_FILE_CHARSET_DEFAULT;
 
         processBreak(roundEnv);
         processCompileOnly(roundEnv);
@@ -115,10 +131,8 @@ public final class CompileCommandProcessor extends AbstractProcessor {
             return true;
 
         final String outputPath = processingEnv.getOptions().get(COMPILE_COMMAND_FILE_PATH_OPTION);
-        final String charset = processingEnv.getOptions().get(COMPILE_COMMAND_FILE_CHARSET_OPTION);
         generateCompileCommandFile(
-            outputPath != null ? outputPath : COMPILE_COMMAND_FILE_PATH_DEFAULT,
-            charset != null ? charset : COMPILE_COMMAND_FILE_CHARSET_DEFAULT
+            outputPath != null ? outputPath : COMPILE_COMMAND_FILE_PATH_DEFAULT
         );
 
         message(NOTE, "Done processing compiler hints annotations");
@@ -162,14 +176,14 @@ public final class CompileCommandProcessor extends AbstractProcessor {
     }
 
     private void processOption(final Element element, String option, RoundEnvironment roundEnv) {
-        lines.add(element.accept(new SimpleElementVisitor6<String, String>() {
+        addLine(element.accept(new SimpleElementVisitor6<Line, String>() {
 
             @Override
-            public String visitExecutable(final ExecutableElement e, final String option) {
-                return Option.class.getSimpleName().toLowerCase() + " " + getDescriptor(e) + " " + option;
+            public Line visitExecutable(final ExecutableElement e, final String option) {
+                return new Line(getDescriptor(e) + " " + option, Option.class);
             }
 
-        }, option));
+        }, option), element);
     }
 
     private void processPrint(RoundEnvironment roundEnv) {
@@ -177,24 +191,37 @@ public final class CompileCommandProcessor extends AbstractProcessor {
     }
 
     private void processQuiet(RoundEnvironment roundEnv) {
-        if (!roundEnv.getElementsAnnotatedWith(Quiet.class).isEmpty())
-            quiet = true;
+        for (Element element : roundEnv.getElementsAnnotatedWith(Quiet.class))
+            addLine(element.accept(new SimpleElementVisitor6<Line, RoundEnvironment>() {
+                @Override
+                public Line visitType(TypeElement e, RoundEnvironment roundEnvironment)
+                {
+                    return new Line("quiet", getDescriptor(e), Quiet.class);
+                }
+
+                @Override
+                public Line visitExecutable(final ExecutableElement e, final RoundEnvironment roundEnvironment) {
+                    return new Line("quiet", getDescriptor(e), Quiet.class);
+                }
+            }, roundEnv), element);
     }
 
     private void processSimpleMethodAnnotation(final Class<? extends Annotation> clazz, RoundEnvironment roundEnv) {
         for (Element element : roundEnv.getElementsAnnotatedWith(clazz))
-            lines.add(element.accept(new SimpleElementVisitor6<String, RoundEnvironment>() {
-
+            addLine(element.accept(new SimpleElementVisitor6<Line, RoundEnvironment>() {
                 @Override
-                public String visitExecutable(final ExecutableElement e, final RoundEnvironment roundEnvironment) {
-                    return clazz.getSimpleName().toLowerCase() + " " + getDescriptor(e);
+                public Line visitExecutable(final ExecutableElement e, final RoundEnvironment roundEnvironment) {
+                    return new Line(getDescriptor(e), clazz);
                 }
+            }, roundEnv), element);
+    }
 
-            }, roundEnv));
+    private String getDescriptor(TypeElement element) {
+        return processingEnv.getElementUtils().getBinaryName(element).toString();
     }
 
     private String getDescriptor(ExecutableElement element) {
-        return processingEnv.getElementUtils().getBinaryName((TypeElement) element.getEnclosingElement())
+        return getDescriptor((TypeElement) element.getEnclosingElement())
                + "::" + element.getSimpleName()
                + " " + getSignature(element);
     }
@@ -242,15 +269,61 @@ public final class CompileCommandProcessor extends AbstractProcessor {
         }, null);
     }
 
-    private void generateCompileCommandFile(String path, String charset) {
+    private void addLine(Line line, Element element) {
+        lines.add(line);
+        if (compileCommandsDir != null) {
+            String p = compileCommandsDir + "/" + makeFileName(line);
+            PrintWriter pw = null;
+            try {
+                final FileObject file = processingEnv.getFiler().createResource(CLASS_OUTPUT, "", p, element);
+                pw = new PrintWriter(new OutputStreamWriter(file.openOutputStream(), charset));
+                pw.println(line.line);
+                pw.flush();
+            } catch (IOException e) {
+                throw new RuntimeException("Failed writing incremental-compile-compatible fragment at " + p, e);
+            } finally {
+                if (pw != null)
+                    pw.close();
+            }
+        }
+    }
+
+    private String makeFileName(Line line) {
+        String fn = line.annotation.getSimpleName().toLowerCase() + '-' + line.descriptor;
+        int l = fn.length();
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < l; i++) {
+            char c = fn.charAt(i);
+            if (Character.isLetterOrDigit(c) || c == '.' || c == '_' || c == '-')
+                sb.append(c);
+            else
+                sb.append(Integer.toHexString(c & 0xffff));
+        }
+        return sb.toString();
+    }
+
+    private void generateCompileCommandFile(String path) {
+        if (compileCommandsDir != null) {
+            message(NOTE, "Wrote incremental-compile-compatible fragments for the hotspot_compiler file to %s.", compileCommandsDir);
+            return;
+        }
+
         message(NOTE, "Writing compiler command file at %s", path);
         PrintWriter pw = null;
         try {
             final FileObject file = processingEnv.getFiler().createResource(CLASS_OUTPUT, "", path);
             pw = new PrintWriter(new OutputStreamWriter(file.openOutputStream(), charset));
-            if (quiet) pw.println("quiet");
-            for (String value : lines)
-                pw.println(value);
+            boolean quiet = false;
+            for (Line value : lines) {
+                if (value.annotation != Quiet.class) {
+                    pw.println(value.line);
+                    continue;
+                }
+
+                if (!quiet)
+                    pw.println(value.line);
+                quiet = true;
+            }
             pw.flush();
         } catch (IOException e) {
             throw new RuntimeException("Failed writing compiler command file at " + path, e);
@@ -262,5 +335,31 @@ public final class CompileCommandProcessor extends AbstractProcessor {
 
     private void message(Diagnostic.Kind level, String msg, Object... args) {
         processingEnv.getMessager().printMessage(level, format(msg, args));
+    }
+
+    private static class Line implements Comparable<Line> {
+        final String line;
+        final String descriptor;
+        final Class annotation;
+
+        Line(String descriptor, Class annotation) {
+            this(annotation.getSimpleName().toLowerCase() + " " + descriptor, descriptor, annotation);
+        }
+
+        Line(String line, String descriptor, Class annotation) {
+            this.line = line;
+            this.descriptor = descriptor;
+            this.annotation = annotation;
+        }
+
+        @Override
+        public int compareTo(Line o)
+        {
+            if (this.annotation == Quiet.class && o.annotation != Quiet.class)
+                return -1;
+            if (this.annotation != Quiet.class && o.annotation == Quiet.class)
+                return 1;
+            return this.line.compareTo(o.line);
+        }
     }
 }
