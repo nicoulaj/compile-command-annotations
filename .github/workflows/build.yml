@@ -37,7 +37,7 @@ jobs:
         java-version: ${{ matrix.java }}
 
     - name: Build
-      run: mvn --batch-mode verify --file pom.xml
+      run: mvn --batch-mode verify
 
     - name: Archive integration test logs
       uses: actions/upload-artifact@v2
@@ -68,4 +68,6 @@ jobs:
 
     - name: Publish snapshot to Github Packages repository
       if: github.event_name == 'push' && github.ref == 'refs/heads/master' && matrix.os == 'ubuntu-latest' && matrix.java == '8'
-      run: mvn --batch-mode deploy -Dregistry=https://maven.pkg.github.com/nicoulaj -Dtoken=${{ secrets.DEPLOY_GITHUB_PACKAGES_TOKEN }}
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      run: mvn --batch-mode deploy -DaltDeploymentRepository=github::https://maven.pkg.github.com/nicoulaj -DskipTests
