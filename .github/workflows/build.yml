@@ -17,7 +17,7 @@ jobs:
 
     runs-on: ${{ matrix.os }}
 
-    name: ${{ matrix.os }} / Java ${{ matrix.java }}
+    name: ${{ matrix.os }} / java ${{ matrix.java }}
 
     steps:
     - name: Checkout
@@ -43,7 +43,7 @@ jobs:
       uses: actions/upload-artifact@v2
       if: failure()
       with:
-        name: integration test logs
+        name: failed integration test logs on ${{ matrix.os }} / java ${{ matrix.java }}
         path: ./target/it/tests/*/build.log
 
     - name: Upload unit test coverage reports
