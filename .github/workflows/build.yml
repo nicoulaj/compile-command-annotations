@@ -14,7 +14,7 @@ jobs:
     strategy:
       matrix:
         java: [ '8', '9', '10', '11', '12', '13', '14' ]
-    
+
     steps:
     - uses: actions/checkout@v2
 
@@ -25,15 +25,15 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-maven-
 
-    - name: JDK setup
+    - name: Setup JDK
       uses: joschi/setup-jdk@v2
       with:
         java-version: ${{ matrix.java }}
 
-    - name: build
+    - name: Build
       run: mvn -B package --file pom.xml
 
-    - name: publish to GitHub packages
-      run: mvn deploy
+    - name: Oublish to GitHub packages
+      run: mvn -B deploy -DskipTests
       env:
-        GITHUB_TOKEN: ${{ github.token }} # GITHUB_TOKEN is the default env for the password
+        GITHUB_TOKEN: ${{ DEPLOY_GITHUB_PACKAGES_TOKEN }}
