@@ -61,7 +61,7 @@ jobs:
         OS: ${{ matrix.os }}
         JAVA_VERSION: ${{ matrix.java }}
       with:
-        file: ./target/site/jacoco/jacoco-it.xml
+        file: ./target/site/jacoco-it/jacoco.xml
         flags: integration
         env_vars: OS,JAVA_VERSION
         fail_ci_if_error: true
