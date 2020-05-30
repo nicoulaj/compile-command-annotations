@@ -48,7 +48,6 @@ jobs:
 
     - name: Upload unit test coverage reports
       uses: codecov/codecov-action@v1
-      if: matrix.os == 'ubuntu-latest' && matrix.java == '8'
       env:
         OS: ${{ matrix.os }}
         JAVA_VERSION: ${{ matrix.java }}
@@ -59,7 +58,6 @@ jobs:
 
     - name: Upload integration test coverage reports
       uses: codecov/codecov-action@v1
-      if: matrix.os == 'ubuntu-latest' && matrix.java == '8'
       env:
         OS: ${{ matrix.os }}
         JAVA_VERSION: ${{ matrix.java }}
