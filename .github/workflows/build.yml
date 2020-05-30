@@ -32,8 +32,3 @@ jobs:
 
     - name: Build
       run: mvn -B package --file pom.xml
-
-    - name: Oublish to GitHub packages
-      run: mvn -B deploy -DskipTests
-      env:
-        GITHUB_TOKEN: ${{ secrets.DEPLOY_GITHUB_PACKAGES_TOKEN }}
