@@ -44,4 +44,4 @@ jobs:
       uses: actions/upload-artifact@v1
       with:
         name: integration test logs
-        path: target/it/tests/IT-*/build.log
+        path: target/it/tests/**/build.log
