@@ -38,9 +38,7 @@ jobs:
       env:
         JAVA_VERSION: ${{ matrix.java }}
       with:
-        file:
-          - target/site/jacoco/jacoco.xml
-          - target/site/jacoco/jacoco-it.xml
+        file: target/site/jacoco/jacoco.xml,target/site/jacoco/jacoco-it.xml
         env_vars: OS,JAVA_VERSION
 
     - name: Archive integration test logs
