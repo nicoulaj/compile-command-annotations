@@ -40,7 +40,7 @@ jobs:
       run: mvn --batch-mode verify --file pom.xml
 
     - name: Archive integration test logs
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v2
       if: failure()
       with:
         name: integration test logs
