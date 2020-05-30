@@ -20,9 +20,11 @@ jobs:
     name: ${{ matrix.os }} / Java ${{ matrix.java }}
 
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout
+      uses: actions/checkout@v2
 
-    - uses: actions/cache@v2
+    - name: Setup cache
+      uses: actions/cache@v2
       with:
         path: ~/.m2/repository
         key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
