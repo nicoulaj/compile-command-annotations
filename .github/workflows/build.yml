@@ -48,7 +48,7 @@ jobs:
 
     - name: Upload unit test coverage reports
       uses: codecov/codecov-action@v1
-      if: ${{ matrix.os }} == 'ubuntu-latest' && ${{ matrix.java }} == '8'
+      if: matrix.os == 'ubuntu-latest' && matrix.java == '8'
       env:
         OS: ${{ matrix.os }}
         JAVA_VERSION: ${{ matrix.java }}
@@ -56,11 +56,10 @@ jobs:
         file: ./target/site/jacoco/jacoco.xml
         flags: unit
         env_vars: OS,JAVA_VERSION
-        fail_ci_if_error: true
 
     - name: Upload integration test coverage reports
       uses: codecov/codecov-action@v1
-      if: ${{ matrix.os }} == 'ubuntu-latest' && ${{ matrix.java }} == '8'
+      if: matrix.os == 'ubuntu-latest' && matrix.java == '8'
       env:
         OS: ${{ matrix.os }}
         JAVA_VERSION: ${{ matrix.java }}
@@ -68,4 +67,3 @@ jobs:
         file: ./target/site/jacoco-it/jacoco.xml
         flags: integration
         env_vars: OS,JAVA_VERSION
-        fail_ci_if_error: true
