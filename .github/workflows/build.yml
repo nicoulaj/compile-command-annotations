@@ -1,0 +1,39 @@
+name: compile-command-annotations
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        java: [ '8', '9', '10', '11', '12', '13', '14' ]
+    
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: actions/cache@v2
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-
+
+    - name: JDK setup
+      uses: joschi/setup-jdk@v2
+      with:
+        java-version: ${{ matrix.java }}
+
+    - name: build
+      run: mvn -B package --file pom.xml
+
+    - name: publish to GitHub packages
+      run: mvn deploy
+      env:
+        GITHUB_TOKEN: ${{ github.token }} # GITHUB_TOKEN is the default env for the password
