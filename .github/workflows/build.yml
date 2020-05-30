@@ -34,15 +34,16 @@ jobs:
     - name: Build
       run: mvn --batch-mode verify --file pom.xml
 
+    - name: Archive integration test logs
+      uses: actions/upload-artifact@v1
+      if: failure()
+      with:
+        name: integration test logs
+        path: target/it/tests/**/build.log
+
     - uses: codecov/codecov-action@v1
       env:
         JAVA_VERSION: ${{ matrix.java }}
       with:
         file: target/site/jacoco/jacoco.xml,target/site/jacoco/jacoco-it.xml
         env_vars: OS,JAVA_VERSION
-
-    - name: Archive integration test logs
-      uses: actions/upload-artifact@v1
-      with:
-        name: integration test logs
-        path: target/it/tests/**/build.log
