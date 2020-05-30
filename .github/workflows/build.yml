@@ -70,4 +70,4 @@ jobs:
       if: github.event_name == 'push' && github.ref == 'refs/heads/master' && matrix.os == 'ubuntu-latest' && matrix.java == '8'
       env:
         GITHUB_TOKEN: ${{ github.token }}
-      run: mvn --batch-mode deploy -DaltDeploymentRepository=github::https://maven.pkg.github.com/nicoulaj -DskipTests
+      run: mvn --batch-mode deploy -DaltDeploymentRepository=github::default::https://maven.pkg.github.com/nicoulaj -DskipTests
