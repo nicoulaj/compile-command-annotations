@@ -36,4 +36,4 @@ jobs:
     - name: Oublish to GitHub packages
       run: mvn -B deploy -DskipTests
       env:
-        GITHUB_TOKEN: ${{ DEPLOY_GITHUB_PACKAGES_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.DEPLOY_GITHUB_PACKAGES_TOKEN }}
