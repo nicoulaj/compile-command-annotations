@@ -63,7 +63,7 @@
     <license>apache_v2</license>
     <debug>false</debug>
     <java.level>1.8</java.level>
-    <guava.version>28.1-jre</guava.version>
+    <guava.version>29.0-jre</guava.version>
     <assertj-core.version>3.13.2</assertj-core.version>
     <commons-io.version>2.6</commons-io.version>
   </properties>
