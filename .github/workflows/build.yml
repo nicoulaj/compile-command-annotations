@@ -17,7 +17,7 @@ jobs:
 
     runs-on: ${{ matrix.os }}
 
-    name: ${{ matrix.os }} / Java ${{ matrix.java }})
+    name: ${{ matrix.os }} / Java ${{ matrix.java }}
 
     steps:
     - uses: actions/checkout@v2
