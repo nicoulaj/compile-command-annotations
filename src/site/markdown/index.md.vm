@@ -64,53 +64,36 @@ Usage
 Incremental compilation support for Gradle
 ------------------------------------------
 
-Incremental compilation in Gradle with this annotation processor requires a few tweaks to work properly.
-The compile-command-annotations-processor needs to write multiple files to be compatible with incremental
-compilation. This is enabled with the `-Acompile.command.incremental.output=COMPILE_COMMAND_INCREMENTAL`
-compiler option. Gradle can then associate and manage these files produced by compile-command-annotations
-with the Java source files. A helper task is then needed to merge all these files into a single
-`hotspot_compiler` file that can be consumed by a compatible JVM.
+The Gradle plugin [gradle-compilecommand](https://plugins.gradle.org/plugin/org.caffinitas.gradle.compilecommand)
+([github](https://github.com/snazy/gradle-compilecommand/)) hides the complexity of using incremental compilation
+with Gradle and the compile-command-annotations annotation processor.
 
-In your module's `build.gradle`:
+To apply the plugin add the following to your module's `build.gradle.kts` (Kotlin):
 
-        buildscript {
-            // note: omitting mandatory repository configuration in this snippet
-            dependencies {
-                classpath("net.nicoulaj.compile-command-annotations:compile-command-annotations:1.2.3")
+        plugins {
+            id("org.caffinitas.gradle.compilecommand") version "0.1.2"
+        }
+
+        compileCommands {
+            add {
+                outputFile = project.file("conf/hotspot_compiler")  // or whereever you want the compile-commands file to be
+                sourceSet = sourceSets.main
             }
         }
 
-        import net.nicoulaj.compilecommand.IncrementalCompilationHelper
-
-        dependencies {
-            annotationProcessor("net.nicoulaj.compile-command-annotations:compile-command-annotations:1.2.3")
-            compileOnly("net.nicoulaj.compile-command-annotations:compile-command-annotations:1.2.3")
+`build.gradle` (Groovy):
+        plugins {
+            id 'org.caffinitas.gradle.compilecommand' version "0.1.2"
         }
 
-        // Have a task that takes the incremental files and merges these into a single hotspot_compiler file.
-        // The helper method IncrementalCompilationHelper.mergeIncrementalFiles ensures that the result file
-        // is deterministic and that the (optional) 'quiet command' is the first in the output file.
-        tasks.register("copyHotspotCompiler", DefaultTask) { DefaultTask t ->
-            t.inputs.files(fileTree("${sourceSets.main.java.outputDir}/COMPILE_COMMAND_INCREMENTAL"))
-            t.outputs.file("conf/hotspot_compiler")
-            t.doLast({
-                IncrementalCompilationHelper.mergeIncrementalFiles(file("${sourceSets.main.java.outputDir}/COMPILE_COMMAND_INCREMENTAL"), file("conf/hotspot_compiler"))
-            })
+        compileCommands {
+            add {
+                outputFile = project.file("conf/hotspot_compiler")  // or whereever you want the compile-commands file to be
+                sourceSet = sourceSets.main
+            }
         }
 
-        tasks.named("compileJava") { JavaCompile t ->
-            // Tell the compile-command-annotations-processor to write the incremental files
-            // to the COMPILE_COMMAND_INCREMENTAL directory.
-            t.options.compilerArgs += ["-Acompile.command.incremental.output=COMPILE_COMMAND_INCREMENTAL"]
-            t.finalizedBy(tasks.named("copyHotspotCompiler"))
-        }
-
-        // exclude the COMPILE_COMMAND_INCREMENTAL directory from the generated jar
-        tasks.named("jar") { Jar t ->
-            t.exclude("COMPILE_COMMAND_INCREMENTAL/**")
-        }
-
-
-Gradle will fall back to full compilation without these tweaks, because incremental compilation needs exactly one
-"element" in the source tree for every output file. Since without these tweaks the single `hotspot_compiler` file
-would have 0 elements, incremental compilation would not work.
+The compile-command annotation-processor dependency is added to the `compileOnly` and `annotationProcessor`.
+configurations. The coordinates of the dependency (as of plugin version 0.1.2) are
+`net.nicoulaj.compile-command-annotations:compile-command-annotations:1.2.3`. To use a different version of the
+annotation-processor, set the property `compileCommandsDependency` in the `compileCommands` extension.
