@@ -64,7 +64,7 @@
     <debug>false</debug>
     <java.level>1.8</java.level>
     <guava.version>29.0-jre</guava.version>
-    <assertj-core.version>3.16.1</assertj-core.version>
+    <assertj-core.version>3.24.0</assertj-core.version>
     <commons-io.version>2.7</commons-io.version>
   </properties>
 
